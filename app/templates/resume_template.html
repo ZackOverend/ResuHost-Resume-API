@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ name }} - Resume</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: top;
+        padding: 4rem;
+      }
+
+      /* Title */
+      h1 {
+        font-size: 36px;
+      }
+      /* Categories Title*/
+      h2 {
+        font-size: 16px;
+        text-align: center;
+        line-height: 0;
+      }
+      /* Categories Sub-Title */
+      h3 {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      /* Date */
+      h4 {
+        font-size: 14px;
+        font-weight: 400;
+        margin-top: 0;
+      }
+      /* Location */
+      h5 {
+        font-size: 12px;
+        font-style: italic;
+        font-weight: 400;
+        margin-top: 4px;
+        margin-bottom: 12px;
+      }
+      ul {
+        padding-left: 32px;
+        font-size: 14px;
+        margin-top: 0;
+      }
+      li {
+        padding: 2px;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+      }
+
+      .line {
+        height: 1px;
+        background-color: black;
+      }
+      .line-vertical {
+        height: 10px;
+        width: 1px;
+        background-color: black;
+      }
+
+      .header {
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        flex-direction: column;
+        line-height: 0;
+      }
+      .header-sub-links {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        padding: 1rem;
+        gap: 4px;
+      }
+
+      .category-content {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+      .category-row {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>ZACKARY OVEREND</h1>
+      <span class="header-sub-links">
+        <a href="tel: 905-515-1185">905-515-1185</a>
+        <div class="line-vertical"></div>
+        <a href="mailto: overendz@sheridancollege.ca"
+          >overendz@sheridancollege.ca</a
+        >
+        <div class="line-vertical"></div>
+        <a href="https://linkedin.com/zackaryoverend"
+          >linkedin.com/zackaryoverend</a
+        >
+        <div class="line-vertical"></div>
+        <a href="https://zackoverend.com">zackoverend.com</a>
+      </span>
+    </div>
+    <main>
+      <section>
+        <div class="line"></div>
+        <h2>EDUCATION</h2>
+        <div class="category-content">
+          <div class="category-row">
+            <div>
+              <h3>Honours Bachelor of Computer Science (Mobile Computing)</h3>
+              <h5>Sheridan College, Oakville, Ontario</h5>
+            </div>
+            <h4>January 2023 - Present</h4>
+          </div>
+          <ul>
+            <li>Cumulative GPA: 3.6</li>
+            <li>Expected Graduation: December 2026</li>
+            <li>
+              Coursework: Data Structures, Operating Sytems, Database
+              Management, AI & ML
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <div class="line"></div>
+        <h2>TECHNICAL SKILLS</h2>
+        <div class="category-content">
+          <ul>
+            <li>
+              <span class="bold">Languages:</span> Swift, TypeScript,
+              JavaScript, Python C#, Kotlin, Dart
+            </li>
+            <li>
+              <span class="bold">Frontend:</span> SwiftUI, React Native,
+              Flutter, React, Next.js, Tailwind CSS
+            </li>
+            <li>
+              <span class="bold">Backend & API:</span> FastAPI, Flask, ASP.NET
+              Core, Node.js, RESTful API
+            </li>
+            <li>
+              <span class="bold">Databases & Cloud:</span> Firebase (Auth,
+              Firestore), Azure, SQL, SQLite, MongoDB
+            </li>
+            <li>
+              <span class="bold">DevOps & Tools:</span> Git/GitHub, GitHub
+              Actions (CI/CD), Docker, Figma
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <div class="line"></div>
+        <h2>WORK EXPERIENCE</h2>
+        <div class="category-content">
+          <div class="category-row">
+            <div>
+              <h3>React Native Software Developer Intern</h3>
+              <h5>Herb Immortal</h5>
+            </div>
+            <h4>May 2025 - August 2025</h4>
+          </div>
+          <ul>
+            <li>
+              Developed application features using TypeScript and REST APIs
+              within an Agile development team
+            </li>
+            <li>
+              Implemented geolocation and map interfaces through third-party API
+              integrations
+            </li>
+            <li>
+              Diagnosed and resolved build, dependency, and runtime issues
+              across development environments
+            </li>
+            <li>
+              Collaborated through code reviews and Git workflows to maintain
+              clean, production-ready code
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <div class="line"></div>
+        <h2>PROJECTS</h2>
+        <div class="category-content">
+          <div>
+            <div class="category-row">
+              <div>
+                <h3>NoWasteMate - iOS App and Backend</h3>
+                <h5>Capstone Project</h5>
+              </div>
+              <h4>2025 - Present</h4>
+            </div>
+            <ul>
+              <li>
+                Built data pipeline using Python to clean and transform user
+                input for analysis
+              </li>
+              <li>
+                Wrote complex SQL queries with joins and aggregations to manage
+                application data
+              </li>
+              <li>
+                Integrated machine learning service for recipe recommendations
+                and evaluated output quality
+              </li>
+              <li>
+                Automated validation and builds with GitHub Actions for code
+                reliability
+              </li>
+            </ul>
+          </div>
+          <div class="category-row">
+            <div>
+              <h3>Developer Profile - Next.js Website</h3>
+              <h5>www.zackoverend.com | Personal Project</h5>
+            </div>
+            <h4>2025 - Present</h4>
+          </div>
+          <ul>
+            <li>
+              Developed application features using TypeScript and REST APIs
+              within an Agile development team
+            </li>
+            <li>
+              Implemented geolocation and map interfaces through third-party API
+              integrations
+            </li>
+            <li>
+              Diagnosed and resolved build, dependency, and runtime issues
+              across development environments
+            </li>
+            <li>
+              Collaborated through code reviews and Git workflows to maintain
+              clean, production-ready code
+            </li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <div class="line"></div>
+        <h2>CO-CURRICULAR ACTIVITIES</h2>
+        <div class="category-content">
+          <div class="category-row">
+            <div>
+              <h3>Sponsorship Outreach & Coordination</h3>
+              <h5>Bearhacks - Sheridan Computer Science Club</h5>
+            </div>
+            <h4>February 2025 - April 2025</h4>
+          </div>
+          <ul>
+            <li>
+              Developed application features using TypeScript and REST APIs
+              within an Agile development team
+            </li>
+            <li>
+              Implemented geolocation and map interfaces through third-party API
+              integrations
+            </li>
+            <li>
+              Diagnosed and resolved build, dependency, and runtime issues
+              across development environments
+            </li>
+            <li>
+              Collaborated through code reviews and Git workflows to maintain
+              clean, production-ready code
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

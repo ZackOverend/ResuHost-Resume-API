@@ -1,11 +1,13 @@
 from fastapi import FastAPI
-from app.api import users, experiences, education
+from app.api import users, experiences, education, resume
 
 app = FastAPI(title="Resume Generator API")
 
 app.include_router(users.router)
 app.include_router(experiences.router)
 app.include_router(education.router)
+app.include_router(resume.router)
+
 
 @app.get("/")
 def root():
