@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ name }} - Resume</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: top;
+        padding: 4rem;
+      }
+
+      /* Title */
+      h1 {
+        font-size: 36px;
+      }
+      /* Categories Title*/
+      h2 {
+        font-size: 16px;
+        text-align: center;
+        line-height: 0;
+      }
+      /* Categories Sub-Title */
+      h3 {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      /* Date */
+      h4 {
+        font-size: 14px;
+        font-weight: 400;
+        margin-top: 0;
+      }
+      /* Location */
+      h5 {
+        font-size: 12px;
+        font-style: italic;
+        font-weight: 400;
+        margin-top: 4px;
+        margin-bottom: 12px;
+      }
+      ul {
+        padding-left: 32px;
+        font-size: 14px;
+        margin-top: 0;
+      }
+      li {
+        padding: 2px;
+      }
+      a {
+        text-decoration: none;
+        color: black;
+      }
+
+      .line {
+        height: 1px;
+        background-color: black;
+      }
+      .line-vertical {
+        height: 10px;
+        width: 1px;
+        background-color: black;
+      }
+
+      .header {
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        flex-direction: column;
+        line-height: 0;
+      }
+      .header-sub-links {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        padding: 1rem;
+        gap: 4px;
+      }
+
+      .category-content {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+      .category-row {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .bold {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>{{ name | upper }}</h1>
+      <span class="header-sub-links">
+        {% if phone %}
+          <a href="tel:{{ phone }}">{{ phone }}</a>
+        {% endif %}
+        {% if phone and email %}<div class="line-vertical"></div>{% endif %}
+        {% if email %}
+          <a href="mailto:{{ email }}">{{ email }}</a>
+        {% endif %}
+        {% if linkedin %}
+          <div class="line-vertical"></div>
+          <a href="{{ linkedin }}">{{ linkedin }}</a>
+        {% endif %}
+        {% if website %}
+          <div class="line-vertical"></div>
+          <a href="{{ website }}">{{ website }}</a>
+        {% endif %}
+      </span>
+    </div>
+    <main>
+      {% if education %}
+      <section>
+        <div class="line"></div>
+        <h2>EDUCATION</h2>
+        {% for edu in education %}
+        <div class="category-content">
+          <div class="category-row">
+            <div>
+              <h3>{{ edu.degree }}{% if edu.degree and edu.institution %} — {% endif %}{{ edu.institution }}</h3>
+              {% if edu.location %}<h5>{{ edu.location }}</h5>{% endif %}
+            </div>
+            {% if edu.start_date or edu.end_date %}
+            <h4>{{ edu.start_date }}{% if edu.start_date and edu.end_date %} - {% endif %}{{ edu.end_date }}</h4>
+            {% endif %}
+          </div>
+          {% if edu.notes %}
+          <ul>
+            {% for note in edu.notes %}
+            <li>{{ note }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      {% if skill_categories %}
+      <section>
+        <div class="line"></div>
+        <h2>TECHNICAL SKILLS</h2>
+        <div class="category-content">
+          <ul>
+            {% for category in skill_categories %}
+            <li><span class="bold">{{ category.name }}:</span> {{ category.skills | join(', ') }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if experiences %}
+      <section>
+        <div class="line"></div>
+        <h2>WORK EXPERIENCE</h2>
+        {% for exp in experiences %}
+        <div class="category-content">
+          <div class="category-row">
+            <div>
+              <h3>{{ exp.role }}</h3>
+              <h5>{{ exp.company }}{% if exp.location %}, {{ exp.location }}{% endif %}</h5>
+            </div>
+            {% if exp.start_date or exp.end_date %}
+            <h4>{{ exp.start_date }}{% if exp.start_date and exp.end_date %} - {% endif %}{{ exp.end_date }}</h4>
+            {% endif %}
+          </div>
+          {% if exp.bullets %}
+          <ul>
+            {% for bullet in exp.bullets %}
+            <li>{{ bullet }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      {% if projects %}
+      <section>
+        <div class="line"></div>
+        <h2>PROJECTS</h2>
+        {% for proj in projects %}
+        <div class="category-content">
+          <div class="category-row">
+            <div>
+              <h3>{{ proj.name }}</h3>
+              {% if proj.subtitle %}<h5>{{ proj.subtitle }}</h5>{% endif %}
+            </div>
+            {% if proj.start_date or proj.end_date %}
+            <h4>{{ proj.start_date }}{% if proj.start_date and proj.end_date %} - {% endif %}{{ proj.end_date }}</h4>
+            {% endif %}
+          </div>
+          {% if proj.bullets %}
+          <ul>
+            {% for bullet in proj.bullets %}
+            <li>{{ bullet }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      {% if activities %}
+      <section>
+        <div class="line"></div>
+        <h2>CO-CURRICULAR ACTIVITIES</h2>
+        {% for act in activities %}
+        <div class="category-content">
+          <div class="category-row">
+            <div>
+              <h3>{{ act.role }}</h3>
+              <h5>{{ act.organization }}</h5>
+            </div>
+            {% if act.start_date or act.end_date %}
+            <h4>{{ act.start_date }}{% if act.start_date and act.end_date %} - {% endif %}{{ act.end_date }}</h4>
+            {% endif %}
+          </div>
+          {% if act.bullets %}
+          <ul>
+            {% for bullet in act.bullets %}
+            <li>{{ bullet }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </section>
+      {% endif %}
+    </main>
+  </body>
+</html>

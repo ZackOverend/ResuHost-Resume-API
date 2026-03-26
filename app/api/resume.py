@@ -5,13 +5,13 @@ from jinja2 import Template
 from weasyprint import HTML
 import os
 
-from app import models, schemas
+from app import models
 from app.database import get_db
 
 router = APIRouter(prefix="/resume", tags=["resume"])
 
 # Load HTML template once at startup
-template_path = os.path.join(os.path.dirname(__file__), "..", "templates", "resume_template.html")
+template_path = os.path.join(os.path.dirname(__file__), "..", "templates", "resume_template_dynamic.html")
 with open(template_path, "r") as f:
     HTML_TEMPLATE = f.read()
 
