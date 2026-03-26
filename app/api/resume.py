@@ -30,15 +30,16 @@ def generate_resume(user_id: int, db: Session = Depends(get_db)):
         "name": user.name,
         "email": user.email,
         "phone": user.phone or "",
-        "summary": user.summary or "",
-        "skills": user.skills or [],
+        "linkedin": user.linkedin or "",
+        "website": user.website or "",
         "experiences": [
             {
                 "company": exp.company,
                 "role": exp.role,
+                "location": exp.location or "",
                 "start_date": exp.start_date or "",
                 "end_date": exp.end_date or "",
-                "description": exp.description or []
+                "bullets": exp.bullets or []
             }
             for exp in user.experiences
         ],
@@ -46,11 +47,40 @@ def generate_resume(user_id: int, db: Session = Depends(get_db)):
             {
                 "institution": edu.institution,
                 "degree": edu.degree or "",
-                "field": edu.field or "",
-                "graduation_date": edu.graduation_date or ""
+                "location": edu.location or "",
+                "start_date": edu.start_date or "",
+                "end_date": edu.end_date or "",
+                "notes": edu.notes or []
             }
             for edu in user.education
-        ]
+        ],
+        "projects": [
+            {
+                "name": proj.name,
+                "subtitle": proj.subtitle or "",
+                "start_date": proj.start_date or "",
+                "end_date": proj.end_date or "",
+                "bullets": proj.bullets or []
+            }
+            for proj in user.projects
+        ],
+        "activities": [
+            {
+                "role": act.role,
+                "organization": act.organization,
+                "start_date": act.start_date or "",
+                "end_date": act.end_date or "",
+                "bullets": act.bullets or []
+            }
+            for act in user.activities
+        ],
+        "skill_categories": [
+            {
+                "name": sc.name,
+                "skills": sc.skills or []
+            }
+            for sc in user.skill_categories
+        ],
     }
 
     try:

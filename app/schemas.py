@@ -1,13 +1,15 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 
-# ===== Experience schemas =====
+
+# ===== Experience =====
 class ExperienceBase(BaseModel):
     company: str
     role: str
+    location: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    description: List[str] = []
+    bullets: List[str] = []
 
 class ExperienceCreate(ExperienceBase):
     pass
@@ -15,16 +17,19 @@ class ExperienceCreate(ExperienceBase):
 class Experience(ExperienceBase):
     id: int
     user_id: int
-    
+
     class Config:
         from_attributes = True
 
-# ===== Education schemas =====
+
+# ===== Education =====
 class EducationBase(BaseModel):
     institution: str
     degree: Optional[str] = None
-    field: Optional[str] = None
-    graduation_date: Optional[str] = None
+    location: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    notes: List[str] = []
 
 class EducationCreate(EducationBase):
     pass
@@ -32,25 +37,83 @@ class EducationCreate(EducationBase):
 class Education(EducationBase):
     id: int
     user_id: int
-    
+
     class Config:
         from_attributes = True
 
-# ===== User schemas=====
+
+# ===== Project =====
+class ProjectBase(BaseModel):
+    name: str
+    subtitle: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    bullets: List[str] = []
+
+class ProjectCreate(ProjectBase):
+    pass
+
+class Project(ProjectBase):
+    id: int
+    user_id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ===== Activity =====
+class ActivityBase(BaseModel):
+    role: str
+    organization: str
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    bullets: List[str] = []
+
+class ActivityCreate(ActivityBase):
+    pass
+
+class Activity(ActivityBase):
+    id: int
+    user_id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ===== SkillCategory =====
+class SkillCategoryBase(BaseModel):
+    name: str
+    skills: List[str] = []
+
+class SkillCategoryCreate(SkillCategoryBase):
+    pass
+
+class SkillCategory(SkillCategoryBase):
+    id: int
+    user_id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ===== User =====
 class UserBase(BaseModel):
     name: str
     email: EmailStr
     phone: Optional[str] = None
-    summary: Optional[str] = None
-    skills: List[str] = []
+    linkedin: Optional[str] = None
+    website: Optional[str] = None
 
 class UserCreate(UserBase):
     pass
 
 class User(UserBase):
     id: int
-    experiences: List[Experience] = []
     education: List[Education] = []
-    
+    experiences: List[Experience] = []
+    projects: List[Project] = []
+    activities: List[Activity] = []
+    skill_categories: List[SkillCategory] = []
+
     class Config:
         from_attributes = True

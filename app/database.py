@@ -1,11 +1,42 @@
 from dotenv import load_dotenv
 import os
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+def resolve_database_url() -> str:
+    """Pick Postgres URL from env. See .env.example for DATABASE_TARGET and URL vars."""
+    target = (os.getenv("DATABASE_TARGET") or "auto").strip().lower()
+    if target in ("", "auto"):
+        url = os.getenv("DATABASE_URL")
+        if not url:
+            raise RuntimeError(
+                "DATABASE_URL is not set. Set DATABASE_URL for default/auto mode, or set "
+                "DATABASE_TARGET=local with LOCAL_DATABASE_URL, or DATABASE_TARGET=supabase "
+                "with SUPABASE_DATABASE_URL."
+            )
+        return url
+    if target == "local":
+        url = os.getenv("LOCAL_DATABASE_URL")
+        if not url:
+            raise RuntimeError(
+                "DATABASE_TARGET=local but LOCAL_DATABASE_URL is not set."
+            )
+        return url
+    if target == "supabase":
+        url = os.getenv("SUPABASE_DATABASE_URL")
+        if not url:
+            raise RuntimeError(
+                "DATABASE_TARGET=supabase but SUPABASE_DATABASE_URL is not set."
+            )
+        return url
+    raise RuntimeError(
+        f"Invalid DATABASE_TARGET={target!r}. Use 'local', 'supabase', or 'auto'."
+    )
+
+
+DATABASE_URL = resolve_database_url()
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -18,22 +49,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-def create_tables():
-    print("🔄 Creating database tables...")
-    try:
-        Base.metadata.create_all(bind=engine)
-        print("✅ Tables created successfully!")
-        
-        # List the tables that were created
-        inspector = inspect(engine)
-        tables = inspector.get_table_names()
-        print(f"📋 Tables: {', '.join(tables)}")
-        
-    except Exception as e:
-        print(f"❌ Error creating tables: {e}")
-        return False
-    return True
-
-if __name__ == "__main__":
-    create_tables()
