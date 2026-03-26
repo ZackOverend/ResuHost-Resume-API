@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api import users, experiences, education, projects, activities, skill_categories, resume, tailor
+from app.api import users, experiences, education, projects, activities, skill_categories, resume, snapshots, tailor
 
 app = FastAPI(title="Resume Generator API")
 
@@ -10,6 +10,7 @@ app.include_router(projects.router)
 app.include_router(activities.router)
 app.include_router(skill_categories.router)
 app.include_router(resume.router)
+app.include_router(snapshots.router)
 app.include_router(tailor.router)
 
 

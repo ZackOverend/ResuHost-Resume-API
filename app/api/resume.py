@@ -3,6 +3,7 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from jinja2 import Template
 from weasyprint import HTML
+from typing import Any, Dict, Optional, cast
 import os
 
 from app import models
@@ -15,18 +16,9 @@ template_path = os.path.join(os.path.dirname(__file__), "..", "templates", "resu
 with open(template_path, "r") as f:
     HTML_TEMPLATE = f.read()
 
-@router.post("/{user_id}", response_class=Response)
-def generate_resume(user_id: int, db: Session = Depends(get_db)):
-    """
-    Generate a PDF resume for the given user.
-    """
-    # Fetch user with experiences and education
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
 
-    # Prepare data for template
-    user_data = {
+def build_user_data(user) -> dict:
+    return {
         "name": user.name,
         "email": user.email,
         "phone": user.phone or "",
@@ -83,19 +75,35 @@ def generate_resume(user_id: int, db: Session = Depends(get_db)):
         ],
     }
 
+
+def render_pdf(user_data: dict, filename: str) -> Response:
     try:
-        # Render HTML
-        template = Template(HTML_TEMPLATE)
-        html_out = template.render(**user_data)
-
-        # Generate PDF
+        html_out = Template(HTML_TEMPLATE).render(**user_data)
         pdf = HTML(string=html_out).write_pdf()
-
-        # Return PDF
         return Response(
             content=pdf,
             media_type="application/pdf",
-            headers={"Content-Disposition": f"attachment; filename={user.name}_resume.pdf"}
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(e)}")
+
+
+@router.post("/{user_id}", response_class=Response)
+def generate_resume(user_id: int, snapshot_id: Optional[int] = None, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if snapshot_id is not None:
+        snapshot = db.query(models.Resume).filter(
+            models.Resume.id == snapshot_id,
+            models.Resume.user_id == user_id
+        ).first()
+        if not snapshot:
+            raise HTTPException(status_code=404, detail="Snapshot not found")
+        user_data = cast(Dict[str, Any], snapshot.data)
+    else:
+        user_data = build_user_data(user)
+
+    return render_pdf(user_data, f"{user.name}_resume.pdf")

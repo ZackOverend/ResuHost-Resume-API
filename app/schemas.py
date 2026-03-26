@@ -1,5 +1,6 @@
+from datetime import datetime
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 
 # ===== Experience =====
@@ -91,6 +92,21 @@ class SkillCategoryCreate(SkillCategoryBase):
 class SkillCategory(SkillCategoryBase):
     id: int
     user_id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ===== Resume Snapshot =====
+class ResumeSnapshotCreate(BaseModel):
+    label: str
+
+class ResumeSnapshot(BaseModel):
+    id: int
+    user_id: int
+    label: str
+    created_at: datetime
+    data: Dict[str, Any]
 
     class Config:
         from_attributes = True

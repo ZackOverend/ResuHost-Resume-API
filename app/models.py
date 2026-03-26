@@ -1,5 +1,6 @@
-from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, JSON, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 from app.database import Base
 
@@ -28,6 +29,9 @@ class User(Base):
     )
     skill_categories = relationship(
         "SkillCategory", back_populates="user", cascade="all, delete-orphan"
+    )
+    resumes = relationship(
+        "Resume", back_populates="user", cascade="all, delete-orphan"
     )
 
 
@@ -98,3 +102,15 @@ class SkillCategory(Base):
     skills = Column(ARRAY(String))
 
     user = relationship("User", back_populates="skill_categories")
+
+
+class Resume(Base):
+    __tablename__ = "resumes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    label = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    data = Column(JSON, nullable=False)
+
+    user = relationship("User", back_populates="resumes")

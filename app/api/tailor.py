@@ -79,3 +79,45 @@ async def tailor_resume(
         raise HTTPException(status_code=502, detail=f"Ollama error: {str(e)}")
 
     return result.output
+
+
+@router.patch("/{user_id}/apply-tailor", response_model=schemas.User)
+def apply_tailor(
+    user_id: int, tailor: schemas.TailorResponse, db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    for item in tailor.experiences:
+        exp = (
+            db.query(models.Experience)
+            .filter(
+                models.Experience.id == item.id, models.Experience.user_id == user_id
+            )
+            .first()
+        )
+        if exp:
+            setattr(exp, "bullets", item.bullets)
+
+    for item in tailor.projects:
+        proj = (
+            db.query(models.Project)
+            .filter(models.Project.id == item.id, models.Project.user_id == user_id)
+            .first()
+        )
+        if proj:
+            setattr(proj, "bullets", item.bullets)
+
+    for item in tailor.activities:
+        act = (
+            db.query(models.Activity)
+            .filter(models.Activity.id == item.id, models.Activity.user_id == user_id)
+            .first()
+        )
+        if act:
+            setattr(act, "bullets", item.bullets)
+
+    db.commit()
+    db.refresh(user)
+    return user
