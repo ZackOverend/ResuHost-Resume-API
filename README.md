@@ -18,43 +18,60 @@ A FastAPI backend for managing resume data and generating PDF resumes via a Jinj
 
 ### Docker (recommended)
 
-**Prerequisites:** [Docker](https://docs.docker.com/get-docker/) installed and running.
+Docker bundles the API and a Postgres database together so you don't need to install or configure anything manually.
 
-**1. Configure environment**
+**Prerequisites:** Install [Docker Desktop](https://docs.docker.com/get-docker/) and make sure it's running before continuing.
+
+**1. Clone the repo and enter the project folder**
+
+```bash
+git clone https://github.com/your-username/resume-api.git
+cd resume-api
+```
+
+**2. Create your environment file**
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` — set the database URL to reference the Compose service name (`db`):
+Open `.env` and add the following — this tells the app how to connect to the database that Docker will spin up:
 
 ```env
 DATABASE_TARGET=auto
 DATABASE_URL=postgresql://resume_user:resume_pass@db:5432/resume_db
 ```
 
-**2. Build and start**
+**3. Start the app**
 
 ```bash
 docker compose up --build
 ```
 
-**3. Create tables** (in a separate terminal)
+This builds the API image and starts both the API and database. Wait until you see output settle — it's ready when you see `Application startup complete`.
+
+**4. Set up the database** (first time only)
+
+Open a **new terminal window** in the same folder and run:
 
 ```bash
 docker compose exec api python create_database.py
 ```
 
-**4. Verify**
+This creates the tables inside the running database container.
 
-- API: `http://localhost:8000`
-- Docs: `http://localhost:8000/docs`
+**5. Open the API**
 
-**Teardown**
+- Interactive docs: `http://localhost:8000/docs`
+- Health check: `http://localhost:8000/health`
+
+**Stopping the app**
+
+Press `Ctrl+C` in the terminal running Docker, then:
 
 ```bash
-docker compose down      # stop containers
-docker compose down -v   # stop and delete database volume
+docker compose down      # stop containers, keep your data
+docker compose down -v   # stop containers and wipe the database
 ```
 
 ### Local
