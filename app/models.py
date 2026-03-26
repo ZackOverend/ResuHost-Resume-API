@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, ARRAY, ForeignKey
+from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
 from app.database import Base
 
 
@@ -13,11 +14,21 @@ class User(Base):
     linkedin = Column(String)
     website = Column(String)
 
-    education = relationship("Education", back_populates="user", cascade="all, delete-orphan")
-    experiences = relationship("Experience", back_populates="user", cascade="all, delete-orphan")
-    projects = relationship("Project", back_populates="user", cascade="all, delete-orphan")
-    activities = relationship("Activity", back_populates="user", cascade="all, delete-orphan")
-    skill_categories = relationship("SkillCategory", back_populates="user", cascade="all, delete-orphan")
+    education = relationship(
+        "Education", back_populates="user", cascade="all, delete-orphan"
+    )
+    experiences = relationship(
+        "Experience", back_populates="user", cascade="all, delete-orphan"
+    )
+    projects = relationship(
+        "Project", back_populates="user", cascade="all, delete-orphan"
+    )
+    activities = relationship(
+        "Activity", back_populates="user", cascade="all, delete-orphan"
+    )
+    skill_categories = relationship(
+        "SkillCategory", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class Education(Base):

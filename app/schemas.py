@@ -96,6 +96,30 @@ class SkillCategory(SkillCategoryBase):
         from_attributes = True
 
 
+# ===== Tailor =====
+class TailorRequest(BaseModel):
+    job_description: str
+    model: str = "qwen3.5:cloud"
+    host: str = "http://localhost:11434"
+
+class TailoredExperience(BaseModel):
+    id: int
+    bullets: List[str]
+
+class TailoredProject(BaseModel):
+    id: int
+    bullets: List[str]
+
+class TailoredActivity(BaseModel):
+    id: int
+    bullets: List[str]
+
+class TailorResponse(BaseModel):
+    experiences: List[TailoredExperience]
+    projects: List[TailoredProject]
+    activities: List[TailoredActivity]
+
+
 # ===== User =====
 class UserBase(BaseModel):
     name: str
