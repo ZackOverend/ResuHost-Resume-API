@@ -1,4 +1,4 @@
-# Resume API
+# ResuHost Resume API
 
 A FastAPI backend for managing resume data and generating PDF resumes via a Jinja2 HTML template and WeasyPrint.
 
