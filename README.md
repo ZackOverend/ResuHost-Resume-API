@@ -1,5 +1,7 @@
 # ResuHost Resume API
 
+![ResuHost Resume API](https://github.com/user-attachments/assets/c9289152-3e3b-41ce-b0db-28859d02f42c)
+
 A FastAPI backend for managing resume data and generating PDF resumes via a Jinja2 HTML template and WeasyPrint.
 
 ## Stack
@@ -10,9 +12,54 @@ A FastAPI backend for managing resume data and generating PDF resumes via a Jinj
 - **Jinja2 + WeasyPrint** — PDF generation
 - **Pydantic** — request/response validation
 
-## Setup
+---
 
-### 1. Install dependencies
+## Getting Started
+
+### Docker (recommended)
+
+**Prerequisites:** [Docker](https://docs.docker.com/get-docker/) installed and running.
+
+**1. Configure environment**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` — set the database URL to reference the Compose service name (`db`):
+
+```env
+DATABASE_TARGET=auto
+DATABASE_URL=postgresql://resume_user:resume_pass@db:5432/resume_db
+```
+
+**2. Build and start**
+
+```bash
+docker compose up --build
+```
+
+**3. Create tables** (in a separate terminal)
+
+```bash
+docker compose exec api python create_database.py
+```
+
+**4. Verify**
+
+- API: `http://localhost:8000`
+- Docs: `http://localhost:8000/docs`
+
+**Teardown**
+
+```bash
+docker compose down      # stop containers
+docker compose down -v   # stop and delete database volume
+```
+
+### Local
+
+**1. Install dependencies**
 
 ```bash
 python -m venv venv
@@ -20,35 +67,51 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configure environment
+**2. Configure environment**
 
-Copy `.env.example` to `.env` and fill in your database credentials.
+```bash
+cp .env.example .env
+```
 
-**Supabase:**
+Edit `.env` with your database credentials:
+
 ```env
+# Local Postgres
+DATABASE_TARGET=local
+LOCAL_DATABASE_URL=postgresql://user:password@localhost:5432/resume_db
+
+# Supabase
 DATABASE_TARGET=supabase
 SUPABASE_DATABASE_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
 ```
 
-**Local Postgres:**
-```env
-DATABASE_TARGET=local
-LOCAL_DATABASE_URL=postgresql://user:password@localhost:5432/resume_db
-```
-
-### 3. Create tables
+**3. Create tables**
 
 ```bash
 python create_database.py
 ```
 
-### 4. Run the server
+**4. Run the server**
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
 API docs available at `http://localhost:8000/docs`.
+
+---
+
+## Ollama (AI tailoring)
+
+When using the `/resume/{user_id}/tailor` endpoint, pass `host` in the request body:
+
+| Context | Host value |
+|---------|------------|
+| Local dev | `http://localhost:11434` |
+| Inside Docker | `http://host.docker.internal:11434` |
+| Remote instance | `http://your-server-ip:11434` |
+
+---
 
 ## Endpoints
 
@@ -106,7 +169,13 @@ API docs available at `http://localhost:8000/docs`.
 | PUT | `/users/{user_id}/skill-categories/{category_id}` | Update skill category |
 | DELETE | `/users/{user_id}/skill-categories/{category_id}` | Delete skill category |
 
-### Resume
+### Resume & Snapshots
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/resume/{user_id}` | Generate PDF resume |
+| POST | `/resume/{user_id}` | Generate PDF (`?snapshot_id=` optional) |
+| POST | `/resume/{user_id}/tailor` | AI-tailor bullets to a job description |
+| PATCH | `/resume/{user_id}/apply-tailor` | Write tailored bullets back to DB |
+| POST | `/users/{user_id}/resumes/` | Save resume snapshot |
+| GET | `/users/{user_id}/resumes/` | List snapshots |
+| GET | `/users/{user_id}/resumes/{resume_id}` | Get snapshot |
+| DELETE | `/users/{user_id}/resumes/{resume_id}` | Delete snapshot |
