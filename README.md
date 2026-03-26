@@ -25,8 +25,8 @@ Docker bundles the API and a Postgres database together so you don't need to ins
 **1. Clone the repo and enter the project folder**
 
 ```bash
-git clone https://github.com/your-username/resume-api.git
-cd resume-api
+git clone https://github.com/ZackOverend/ResuHost-Resume-API.git
+cd ResuHost-Resume-API
 ```
 
 **2. Create your environment file**
