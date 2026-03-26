@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: resume_user
+          POSTGRES_PASSWORD: resume_pass
+          POSTGRES_DB: resume_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libpango-1.0-0 \
+            libpangoft2-1.0-0 \
+            libcairo2 \
+            libffi-dev \
+            libgdk-pixbuf2.0-0 \
+            shared-mime-info
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Import check
+        env:
+          DATABASE_TARGET: local
+          LOCAL_DATABASE_URL: postgresql://resume_user:resume_pass@localhost:5432/resume_db
+        run: python -c "from app.main import app; print('Import check passed')"
+
+      - name: Create tables
+        env:
+          DATABASE_TARGET: local
+          LOCAL_DATABASE_URL: postgresql://resume_user:resume_pass@localhost:5432/resume_db
+        run: python create_database.py
