@@ -47,8 +47,8 @@ This builds the API image, starts the database, creates the tables, and launches
 
 **4. Open the API**
 
-- Interactive docs: `http://localhost:8000/docs`
-- Health check: `http://localhost:8000/health`
+- Interactive docs: `http://localhost:2002/docs`
+- Health check: `http://localhost:2002/health`
 
 **5. Stopping the app**
 
@@ -101,7 +101,7 @@ python3 create_database.py
 uvicorn app.main:app --reload
 ```
 
-API docs available at `http://localhost:8000/docs`.
+API docs available at `http://localhost:2002/docs`.
 
 ---
 
