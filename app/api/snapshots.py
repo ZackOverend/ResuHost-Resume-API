@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -27,7 +29,7 @@ def list_snapshots(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{resume_id}", response_model=schemas.ResumeSnapshot)
-def get_snapshot(user_id: int, resume_id: int, db: Session = Depends(get_db)):
+def get_snapshot(user_id: int, resume_id: UUID, db: Session = Depends(get_db)):
     snapshot = db.query(models.Resume).filter(models.Resume.id == resume_id, models.Resume.user_id == user_id).first()
     if not snapshot:
         raise HTTPException(status_code=404, detail="Snapshot not found")
@@ -35,7 +37,7 @@ def get_snapshot(user_id: int, resume_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{resume_id}")
-def delete_snapshot(user_id: int, resume_id: int, db: Session = Depends(get_db)):
+def delete_snapshot(user_id: int, resume_id: UUID, db: Session = Depends(get_db)):
     snapshot = db.query(models.Resume).filter(models.Resume.id == resume_id, models.Resume.user_id == user_id).first()
     if not snapshot:
         raise HTTPException(status_code=404, detail="Snapshot not found")

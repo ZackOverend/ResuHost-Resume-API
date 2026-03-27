@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from uuid import UUID
 from pydantic import BaseModel, EmailStr
 from typing import Any, Dict, List, Optional
 
@@ -103,7 +104,7 @@ class ResumeSnapshotCreate(BaseModel):
     label: str
 
 class ResumeSnapshot(BaseModel):
-    id: int
+    id: UUID
     user_id: int
     label: str
     created_at: datetime
