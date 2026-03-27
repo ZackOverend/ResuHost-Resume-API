@@ -43,24 +43,14 @@ The default configuration already points to the Docker database, so no changes a
 docker compose up --build
 ```
 
-This builds the API image and starts both the API and database. Wait until you see output settle — it's ready when you see `Application startup complete`.
+This builds the API image, starts the database, creates the tables, and launches the server. It's ready when you see `Application startup complete`.
 
-**4. Set up the database** (first time only)
-
-Open a **new terminal window** in the same folder and run:
-
-```bash
-docker compose exec api python create_database.py
-```
-
-This creates the tables inside the running database container.
-
-**5. Open the API**
+**4. Open the API**
 
 - Interactive docs: `http://localhost:8000/docs`
 - Health check: `http://localhost:8000/health`
 
-**Stopping the app**
+**5. Stopping the app**
 
 Press `Ctrl+C` in the terminal running Docker, then:
 
