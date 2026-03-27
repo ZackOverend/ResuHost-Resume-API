@@ -115,13 +115,51 @@ API docs available at `http://localhost:8000/docs`.
 
 ## Ollama (AI tailoring)
 
-When using the `/resume/{user_id}/tailor` endpoint, pass `host` in the request body:
+The `/resume/{user_id}/tailor` endpoint uses Ollama to rewrite resume bullets for a given job description. Configure it via `.env` or by passing values directly in the request body.
 
-| Context | Host value |
-|---------|------------|
-| Local dev | `http://localhost:11434` |
-| Inside Docker | `http://host.docker.internal:11434` |
-| Remote instance | `http://your-server-ip:11434` |
+### Environment variables
+
+**Database**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_TARGET` | `auto` | Connection mode: `auto`, `local`, or `supabase` |
+| `DATABASE_URL` | | Used when `DATABASE_TARGET=auto` |
+| `LOCAL_DATABASE_URL` | | Used when `DATABASE_TARGET=local` |
+| `SUPABASE_DATABASE_URL` | | Used when `DATABASE_TARGET=supabase` |
+
+**Ollama**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OLLAMA_HOST` | `http://host.docker.internal:11434` | URL of your Ollama instance |
+| `OLLAMA_MODEL` | `qwen3.5:cloud` | Model to use |
+| `OLLAMA_API_KEY` | `ollama` | API key (only required for Ollama Cloud) |
+
+### Deployment options
+
+**Local Ollama running on your machine (outside Docker)**
+```env
+OLLAMA_HOST=http://localhost:11434
+```
+
+**Local Ollama accessed from inside Docker (default)**
+```env
+OLLAMA_HOST=http://host.docker.internal:11434
+```
+
+**Ollama Cloud**
+```env
+OLLAMA_HOST=https://api.ollama.com
+OLLAMA_API_KEY=your_ollama_api_key
+```
+
+**Self-hosted remote instance**
+```env
+OLLAMA_HOST=http://your-server-ip:11434
+```
+
+All values can also be overridden per-request in the `POST /resume/{user_id}/tailor` request body.
 
 ---
 

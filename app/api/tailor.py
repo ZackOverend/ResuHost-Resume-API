@@ -52,7 +52,7 @@ async def tailor_resume(
             detail="User has no experiences, projects, or activities to tailor",
         )
 
-    provider = OpenAIProvider(base_url=f"{request.host}/v1", api_key="ollama")
+    provider = OpenAIProvider(base_url=f"{request.host}/v1", api_key=request.api_key)
     agent = Agent(
         OpenAIChatModel(request.model, provider=provider),
         output_type=schemas.TailorResponse,

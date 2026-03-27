@@ -118,6 +118,7 @@ class TailorRequest(BaseModel):
     job_description: str
     model: str = os.getenv("OLLAMA_MODEL", "llama3")
     host: str = os.getenv("OLLAMA_HOST", "http://host.docker.internal:11434")
+    api_key: str = os.getenv("OLLAMA_API_KEY", "ollama")
 
 class TailoredExperience(BaseModel):
     id: int
