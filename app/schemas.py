@@ -18,8 +18,8 @@ class ExperienceCreate(ExperienceBase):
     pass
 
 class Experience(ExperienceBase):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
 
     class Config:
         from_attributes = True
@@ -38,8 +38,8 @@ class EducationCreate(EducationBase):
     pass
 
 class Education(EducationBase):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
 
     class Config:
         from_attributes = True
@@ -57,8 +57,8 @@ class ProjectCreate(ProjectBase):
     pass
 
 class Project(ProjectBase):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
 
     class Config:
         from_attributes = True
@@ -76,8 +76,8 @@ class ActivityCreate(ActivityBase):
     pass
 
 class Activity(ActivityBase):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
 
     class Config:
         from_attributes = True
@@ -92,8 +92,8 @@ class SkillCategoryCreate(SkillCategoryBase):
     pass
 
 class SkillCategory(SkillCategoryBase):
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
 
     class Config:
         from_attributes = True
@@ -105,7 +105,7 @@ class ResumeSnapshotCreate(BaseModel):
 
 class ResumeSnapshot(BaseModel):
     id: UUID
-    user_id: int
+    user_id: UUID
     label: str
     created_at: datetime
     data: Dict[str, Any]
@@ -122,15 +122,15 @@ class TailorRequest(BaseModel):
     api_key: str = os.getenv("OLLAMA_API_KEY", "ollama")
 
 class TailoredExperience(BaseModel):
-    id: int
+    id: UUID
     bullets: List[str]
 
 class TailoredProject(BaseModel):
-    id: int
+    id: UUID
     bullets: List[str]
 
 class TailoredActivity(BaseModel):
-    id: int
+    id: UUID
     bullets: List[str]
 
 class TailorResponse(BaseModel):
@@ -151,7 +151,7 @@ class UserCreate(UserBase):
     pass
 
 class User(UserBase):
-    id: int
+    id: UUID
     education: List[Education] = []
     experiences: List[Experience] = []
     projects: List[Project] = []

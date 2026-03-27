@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
@@ -39,7 +41,7 @@ def _build_resume_context(user) -> str:
 
 @router.post("/{user_id}/tailor", response_model=schemas.TailorResponse)
 async def tailor_resume(
-    user_id: int, request: schemas.TailorRequest, db: Session = Depends(get_db)
+    user_id: UUID, request: schemas.TailorRequest, db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
@@ -83,7 +85,7 @@ async def tailor_resume(
 
 @router.patch("/{user_id}/apply-tailor", response_model=schemas.User)
 def apply_tailor(
-    user_id: int, tailor: schemas.TailorResponse, db: Session = Depends(get_db)
+    user_id: UUID, tailor: schemas.TailorResponse, db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:

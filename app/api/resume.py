@@ -91,7 +91,7 @@ def render_pdf(user_data: dict, filename: str) -> Response:
 
 
 @router.post("/{user_id}", response_class=Response)
-def generate_resume(user_id: int, snapshot_id: Optional[UUID] = None, db: Session = Depends(get_db)):
+def generate_resume(user_id: UUID, snapshot_id: Optional[UUID] = None, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

@@ -1,3 +1,4 @@
+from uuid import UUID
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -13,7 +14,7 @@ router = APIRouter(
 
 @router.post("/", response_model=schemas.SkillCategory)
 def create_skill_category(
-    user_id: int, category: schemas.SkillCategoryCreate, db: Session = Depends(get_db)
+    user_id: UUID, category: schemas.SkillCategoryCreate, db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
@@ -26,7 +27,7 @@ def create_skill_category(
 
 
 @router.get("/", response_model=List[schemas.SkillCategory])
-def list_skill_categories(user_id: int, db: Session = Depends(get_db)):
+def list_skill_categories(user_id: UUID, db: Session = Depends(get_db)):
     return (
         db.query(models.SkillCategory)
         .filter(models.SkillCategory.user_id == user_id)
@@ -35,7 +36,7 @@ def list_skill_categories(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{category_id}", response_model=schemas.SkillCategory)
-def get_skill_category(user_id: int, category_id: int, db: Session = Depends(get_db)):
+def get_skill_category(user_id: UUID, category_id: UUID, db: Session = Depends(get_db)):
     category = (
         db.query(models.SkillCategory)
         .filter(
@@ -51,8 +52,8 @@ def get_skill_category(user_id: int, category_id: int, db: Session = Depends(get
 
 @router.put("/{category_id}", response_model=schemas.SkillCategory)
 def update_skill_category(
-    user_id: int,
-    category_id: int,
+    user_id: UUID,
+    category_id: UUID,
     category: schemas.SkillCategoryCreate,
     db: Session = Depends(get_db),
 ):
@@ -75,7 +76,7 @@ def update_skill_category(
 
 @router.delete("/{category_id}")
 def delete_skill_category(
-    user_id: int, category_id: int, db: Session = Depends(get_db)
+    user_id: UUID, category_id: UUID, db: Session = Depends(get_db)
 ):
     db_category = (
         db.query(models.SkillCategory)
