@@ -35,7 +35,7 @@ cd ResuHost-Resume-API
 cp .env.example .env
 ```
 
-The default configuration already points to the Docker database, so no changes are needed to get started. To use a different database, `.env.example` includes commented examples for local Postgres and Supabase.
+The default configuration starts a local Postgres container, so no changes are needed to get started. To use Supabase instead, see the commented Supabase section in `.env.example`.
 
 **3. Start the app**
 
@@ -64,7 +64,7 @@ docker compose down -v   # stop containers and wipe the database
 **1. Install dependencies**
 
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -80,17 +80,19 @@ Edit `.env` with your database credentials:
 ```env
 # Local Postgres
 DATABASE_TARGET=local
-LOCAL_DATABASE_URL=postgresql://user:password@localhost:5432/resume_db
+LOCAL_DATABASE_URL=postgresql://resume_user:resume_pass@db:5432/resume_db
+COMPOSE_PROFILES=local
 
 # Supabase
 DATABASE_TARGET=supabase
 SUPABASE_DATABASE_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+COMPOSE_PROFILES=supabase
 ```
 
 **3. Create tables**
 
 ```bash
-python create_database.py
+python3 create_database.py
 ```
 
 **4. Run the server**
@@ -113,8 +115,8 @@ The `/resume/{user_id}/tailor` endpoint uses Ollama to rewrite resume bullets fo
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_TARGET` | `auto` | Connection mode: `auto`, `local`, or `supabase` |
-| `DATABASE_URL` | | Used when `DATABASE_TARGET=auto` |
+| `DATABASE_TARGET` | `local` | Connection mode: `local` or `supabase` |
+| `COMPOSE_PROFILES` | `local` | Controls whether Docker starts a local Postgres container (`local` or `supabase`) |
 | `LOCAL_DATABASE_URL` | | Used when `DATABASE_TARGET=local` |
 | `SUPABASE_DATABASE_URL` | | Used when `DATABASE_TARGET=supabase` |
 

@@ -1,3 +1,9 @@
+# Profiles:
+#   supabase (default) — only the api starts; database is hosted on Supabase
+#   local              — api + db start; local Postgres container is used
+#
+# Set COMPOSE_PROFILES in your .env to match your DATABASE_TARGET.
+
 services:
   api:
     build: .
@@ -8,8 +14,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+        required: false
 
   db:
+    profiles: ["local"]
     image: postgres:16
     environment:
       POSTGRES_USER: resume_user
