@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from typing import Any, Dict, List, Optional
@@ -115,8 +116,8 @@ class ResumeSnapshot(BaseModel):
 # ===== Tailor =====
 class TailorRequest(BaseModel):
     job_description: str
-    model: str = "qwen3.5:cloud"
-    host: str = "http://localhost:11434"
+    model: str = os.getenv("OLLAMA_MODEL", "llama3")
+    host: str = os.getenv("OLLAMA_HOST", "http://host.docker.internal:11434")
 
 class TailoredExperience(BaseModel):
     id: int

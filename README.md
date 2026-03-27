@@ -35,12 +35,7 @@ cd ResuHost-Resume-API
 cp .env.example .env
 ```
 
-Open `.env` and add the following — this tells the app how to connect to the database that Docker will spin up:
-
-```env
-DATABASE_TARGET=auto
-DATABASE_URL=postgresql://resume_user:resume_pass@db:5432/resume_db
-```
+The default configuration already points to the Docker database, so no changes are needed to get started. To use a different database, `.env.example` includes commented examples for local Postgres and Supabase.
 
 **3. Start the app**
 
