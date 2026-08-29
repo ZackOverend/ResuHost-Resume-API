@@ -32,3 +32,42 @@ def test_tailor_request_does_not_accept_provider_credentials():
             host="http://attacker.invalid",
             api_key="not-allowed",
         )
+
+
+def test_experience_dates_use_month_precision():
+    experience = ExperienceCreate(
+        company="Acme",
+        role="Engineer",
+        start_date="2026-01",
+        is_current=True,
+    )
+
+    assert experience.start_date == "2026-01"
+    assert experience.end_date is None
+
+
+@pytest.mark.parametrize("end_date", ["2025", "2025-13", "January 2025"])
+def test_experience_rejects_invalid_month_dates(end_date):
+    with pytest.raises(ValidationError):
+        ExperienceCreate(company="Acme", role="Engineer", end_date=end_date)
+
+
+def test_current_experience_rejects_end_date():
+    with pytest.raises(ValidationError):
+        ExperienceCreate(
+            company="Acme",
+            role="Engineer",
+            start_date="2025-01",
+            end_date="2026-01",
+            is_current=True,
+        )
+
+
+def test_experience_rejects_reversed_date_range():
+    with pytest.raises(ValidationError):
+        ExperienceCreate(
+            company="Acme",
+            role="Engineer",
+            start_date="2026-01",
+            end_date="2025-01",
+        )

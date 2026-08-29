@@ -1,20 +1,33 @@
 from datetime import datetime
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, model_validator
 from typing import Any, Dict, List, Optional
 from typing_extensions import Annotated
 
 
 NonEmptyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+MonthText = Annotated[str, StringConstraints(pattern=r"^\d{4}-(0[1-9]|1[0-2])$")]
+
+
+class DateRange(BaseModel):
+    start_date: Optional[MonthText] = None
+    end_date: Optional[MonthText] = None
+    is_current: bool = False
+
+    @model_validator(mode="after")
+    def validate_date_range(self):
+        if self.is_current and self.end_date is not None:
+            raise ValueError("end_date must be omitted when is_current is true")
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValueError("end_date cannot be earlier than start_date")
+        return self
 
 
 # ===== Experience =====
-class ExperienceBase(BaseModel):
+class ExperienceBase(DateRange):
     company: NonEmptyText
     role: NonEmptyText
     location: Optional[str] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
     bullets: List[str] = Field(default_factory=list)
 
 class ExperienceCreate(ExperienceBase):
@@ -34,12 +47,10 @@ class Experience(ExperienceBase):
 
 
 # ===== Education =====
-class EducationBase(BaseModel):
+class EducationBase(DateRange):
     institution: NonEmptyText
     degree: Optional[str] = None
     location: Optional[str] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
     notes: List[str] = Field(default_factory=list)
 
 class EducationCreate(EducationBase):
@@ -59,11 +70,9 @@ class Education(EducationBase):
 
 
 # ===== Project =====
-class ProjectBase(BaseModel):
+class ProjectBase(DateRange):
     name: NonEmptyText
     subtitle: Optional[str] = None
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
     bullets: List[str] = Field(default_factory=list)
 
 class ProjectCreate(ProjectBase):
@@ -83,11 +92,9 @@ class Project(ProjectBase):
 
 
 # ===== Activity =====
-class ActivityBase(BaseModel):
+class ActivityBase(DateRange):
     role: NonEmptyText
     organization: NonEmptyText
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
     bullets: List[str] = Field(default_factory=list)
 
 class ActivityCreate(ActivityBase):
