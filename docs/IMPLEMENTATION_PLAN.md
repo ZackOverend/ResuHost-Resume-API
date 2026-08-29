@@ -2,8 +2,8 @@
 
 **Owner:** Zack Overend  
 **Created:** 2026-08-29  
-**Status:** In implementation — Phase 0 complete
-**Version:** 0.3
+**Status:** In implementation — Phase 1 API foundation complete
+**Version:** 0.4
 **Repositories:**
 
 - API: `/Users/zackaryoverend/Development/ResuHost-Resume-API`
@@ -50,9 +50,27 @@ Verification:
 - The Next.js production build succeeds.
 - Full-repository lint still reports pre-existing findings in the smooth-scroll provider and the uncommitted self-host page; Phase 0 did not modify those files.
 
+### 2026-08-29 — Phase 1 Master Profile API foundation
+
+Completed:
+
+- Added lifecycle metadata, explicit ordering, verification timestamps, and archive state to Master Profile records.
+- Added validated `YYYY-MM` date ranges and explicit current-record handling.
+- Added the aggregate `GET /v1/users/{user_id}/profile` endpoint with a deterministic profile-version hash.
+- Added partial contact updates through `PATCH /v1/users/{user_id}/profile`.
+- Added create, partial update, reorder, archive, restore, and guarded permanent-delete operations for experiences, education, projects, activities, and skill categories.
+- Kept legacy endpoints available during the `/v1` migration.
+
+Verification:
+
+- 31 tests pass locally.
+- The PostgreSQL integration suite remains configured for CI and is skipped locally without `TEST_DATABASE_URL`.
+- The complete Alembic migration chain renders successfully in offline SQL mode.
+- The generated FastAPI route table contains all planned Phase 1 Master Profile resource operations.
+
 Next vertical slice:
 
-- Begin the Master Profile aggregate API and workspace.
+- Build the frontend Master Profile workspace against the new `/v1` aggregate and resource endpoints.
 
 ## Purpose
 
