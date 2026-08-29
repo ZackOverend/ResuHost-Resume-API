@@ -343,3 +343,39 @@ class ResumeDocument(BaseModel):
     profile_version: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
     contact: ResumeDocumentContact
     sections: List[ResumeDocumentSection] = Field(default_factory=list)
+
+
+# ===== Evidence-backed Tailoring =====
+class SuggestionVerificationIssue(BaseModel):
+    code: Literal[
+        "missing_source_entry",
+        "wrong_section",
+        "missing_source_bullet",
+        "stale_source_hash",
+        "source_text_changed",
+        "introduced_metric",
+    ]
+    message: NonEmptyText
+
+
+class SuggestionVerification(BaseModel):
+    status: Literal["pass", "fail"]
+    issues: List[SuggestionVerificationIssue] = Field(default_factory=list)
+
+
+class TailoringSuggestionCandidate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    section: Literal["experience", "project", "education", "activity", "skill"]
+    entry_id: UUID
+    source_index: int = Field(ge=0)
+    source_hash: Annotated[str, StringConstraints(pattern=r"^sha256:[0-9a-f]{64}$")]
+    original_text: NonEmptyText
+    proposed_text: NonEmptyText
+    reason: NonEmptyText
+    matched_requirements: List[str] = Field(default_factory=list)
+
+
+class TailoringSuggestion(TailoringSuggestionCandidate):
+    verification: SuggestionVerification
