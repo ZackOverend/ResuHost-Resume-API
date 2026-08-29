@@ -153,6 +153,19 @@ class ActivityBase(DateRange):
 class ActivityCreate(ActivityBase):
     pass
 
+
+class ActivityPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    role: Optional[NonEmptyText] = None
+    organization: Optional[NonEmptyText] = None
+    start_date: Optional[MonthText] = None
+    end_date: Optional[MonthText] = None
+    is_current: Optional[bool] = None
+    bullets: Optional[List[str]] = None
+    sort_order: Optional[int] = Field(default=None, ge=0)
+
+
 class Activity(ActivityBase):
     model_config = ConfigDict(from_attributes=True)
 

@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from app.api.profile import _ordered, _profile_version
 from app.schemas import (
+    ActivityPatch,
     EducationPatch,
     ExperiencePatch,
     ProfileContactPatch,
@@ -61,6 +62,12 @@ def test_project_patch_tracks_only_supplied_fields():
     patch = ProjectPatch(subtitle="Compiler project")
 
     assert patch.model_dump(exclude_unset=True) == {"subtitle": "Compiler project"}
+
+
+def test_activity_patch_tracks_only_supplied_fields():
+    patch = ActivityPatch(role="Treasurer")
+
+    assert patch.model_dump(exclude_unset=True) == {"role": "Treasurer"}
 
 
 def test_reorder_rejects_duplicate_ids():
