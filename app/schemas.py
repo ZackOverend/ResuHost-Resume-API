@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, model_validator
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 from typing_extensions import Annotated
 
 
@@ -302,3 +302,44 @@ class MasterProfile(BaseModel):
     projects: List[Project] = Field(default_factory=list)
     activities: List[Activity] = Field(default_factory=list)
     skill_categories: List[SkillCategory] = Field(default_factory=list)
+
+
+# ===== Canonical Resume Document =====
+class ResumeDocumentContact(BaseModel):
+    name: NonEmptyText
+    email: EmailStr
+    phone: Optional[str] = None
+    linkedin: Optional[str] = None
+    website: Optional[str] = None
+
+
+class ResumeDocumentBullet(BaseModel):
+    text: NonEmptyText
+    source_section: Literal["experience", "project", "education", "activity", "skill"]
+    source_entry_id: UUID
+    source_index: int = Field(ge=0)
+    source_hash: Annotated[str, StringConstraints(pattern=r"^sha256:[0-9a-f]{64}$")]
+
+
+class ResumeDocumentEntry(BaseModel):
+    source_entry_id: UUID
+    heading: NonEmptyText
+    subheading: Optional[str] = None
+    location: Optional[str] = None
+    start_date: Optional[MonthText] = None
+    end_date: Optional[MonthText] = None
+    is_current: bool = False
+    bullets: List[ResumeDocumentBullet] = Field(default_factory=list)
+
+
+class ResumeDocumentSection(BaseModel):
+    kind: Literal["experience", "project", "education", "activity", "skill"]
+    label: NonEmptyText
+    entries: List[ResumeDocumentEntry] = Field(default_factory=list)
+
+
+class ResumeDocument(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
+    profile_version: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
+    contact: ResumeDocumentContact
+    sections: List[ResumeDocumentSection] = Field(default_factory=list)
