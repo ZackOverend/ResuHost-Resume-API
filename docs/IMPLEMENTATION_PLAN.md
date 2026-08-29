@@ -2,8 +2,8 @@
 
 **Owner:** Zack Overend  
 **Created:** 2026-08-29  
-**Status:** In implementation — Phase 1 API foundation complete
-**Version:** 0.4
+**Status:** In implementation — Phase 1 complete
+**Version:** 0.5
 **Repositories:**
 
 - API: `/Users/zackaryoverend/Development/ResuHost-Resume-API`
@@ -70,7 +70,30 @@ Verification:
 
 Next vertical slice:
 
-- Build the frontend Master Profile workspace against the new `/v1` aggregate and resource endpoints.
+### 2026-08-29 — Phase 1 Master Profile workspace
+
+Completed:
+
+- Added the `/profile` workspace with contact, experience, project, education, activity, and skill-group management.
+- Added create, partial edit, reorder, archive, restore, and guarded permanent-delete flows.
+- Added explicit review controls for contact details and every active career record.
+- Invalidated review timestamps whenever the corresponding content changes.
+- Added actionable readiness checks based on profile content and review state.
+- Added a base-resume preview that uses only active records in their explicit order.
+- Preserved form drafts after recoverable save failures and added specific saved/error feedback.
+- Kept all backend credentials behind allowlisted same-origin route handlers.
+
+Verification:
+
+- 32 backend tests pass locally, with 1 PostgreSQL integration suite skipped without `TEST_DATABASE_URL`.
+- 17 frontend tests pass.
+- Frontend TypeScript and targeted ESLint checks pass.
+- The Next.js production build succeeds and includes the dynamic profile and preview routes.
+- Pre-existing user-owned navbar, footer, and self-host changes remain outside the Phase 1 commits.
+
+Next vertical slice:
+
+- Begin Phase 2 with persisted, non-destructive resume variants and evidence-constrained tailoring.
 
 ## Purpose
 
