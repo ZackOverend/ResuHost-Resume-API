@@ -2,8 +2,8 @@
 
 **Owner:** Zack Overend  
 **Created:** 2026-08-29  
-**Status:** In implementation — Phase 0 API foundation complete  
-**Version:** 0.2  
+**Status:** In implementation — Phase 0 complete
+**Version:** 0.3
 **Repositories:**
 
 - API: `/Users/zackaryoverend/Development/ResuHost-Resume-API`
@@ -32,9 +32,27 @@ Verification:
 - CI supplies a disposable PostgreSQL service and is configured to run the integration test.
 - The initial Alembic revision renders successfully in offline SQL mode.
 
+### 2026-08-29 — Phase 0 frontend foundation
+
+Completed:
+
+- Added a typed, server-only API boundary with validated runtime configuration.
+- Added upstream timeouts, safe error parsing, and normalized route-handler failures.
+- Added a committed environment-variable template.
+- Replaced implicit `users[0]` selection with `PRIMARY_USER_ID`.
+- Added route-level loading and retryable error states for the demo.
+- Added Vitest and initial API-client and route-handler coverage.
+
+Verification:
+
+- 10 frontend tests pass.
+- TypeScript and targeted lint checks pass.
+- The Next.js production build succeeds.
+- Full-repository lint still reports pre-existing findings in the smooth-scroll provider and the uncommitted self-host page; Phase 0 did not modify those files.
+
 Next vertical slice:
 
-- Complete the Phase 0 frontend API-client foundation, then begin the Master Profile aggregate API and workspace.
+- Begin the Master Profile aggregate API and workspace.
 
 ## Purpose
 
