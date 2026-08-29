@@ -29,3 +29,12 @@ def test_create_and_get_user(client, db_session):
     assert profile.json()["contact"]["email"] == email
     assert profile.json()["experiences"] == []
     assert len(profile.json()["profile_version"]) == 64
+
+    updated = client.patch(
+        f"/v1/users/{user_id}/profile",
+        headers=headers,
+        json={"phone": "555-0100"},
+    )
+    assert updated.status_code == 200
+    assert updated.json()["contact"]["phone"] == "555-0100"
+    assert updated.json()["profile_version"] != profile.json()["profile_version"]

@@ -2,6 +2,7 @@ from types import SimpleNamespace
 from uuid import UUID
 
 from app.api.profile import _ordered, _profile_version
+from app.schemas import ProfileContactPatch
 
 
 def test_profile_version_is_deterministic_for_equivalent_data():
@@ -27,3 +28,9 @@ def test_profile_records_are_ordered_with_archived_records_last():
     ]
 
     assert [record.id.int for record in _ordered(records)] == [1, 2, 3]
+
+
+def test_contact_patch_tracks_only_supplied_fields():
+    patch = ProfileContactPatch(phone="555-0100")
+
+    assert patch.model_dump(exclude_unset=True) == {"phone": "555-0100"}

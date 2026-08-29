@@ -71,3 +71,40 @@ def get_profile(user_id: UUID, db: Session = Depends(get_db)):
         ],
     }
     return {"profile_version": _profile_version(profile_data), **profile_data}
+
+
+@router.patch("", response_model=schemas.MasterProfile)
+def update_profile(
+    user_id: UUID,
+    patch: schemas.ProfileContactPatch,
+    db: Session = Depends(get_db),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    changes = patch.model_dump(exclude_unset=True)
+    for required_field in ("name", "email"):
+        if required_field in changes and changes[required_field] is None:
+            raise HTTPException(
+                status_code=422,
+                detail=f"{required_field.capitalize()} cannot be null",
+            )
+
+    if "email" in changes:
+        email_owner = (
+            db.query(models.User)
+            .filter(
+                models.User.email == changes["email"],
+                models.User.id != user_id,
+            )
+            .first()
+        )
+        if email_owner:
+            raise HTTPException(status_code=409, detail="Email already registered")
+
+    for field, value in changes.items():
+        setattr(user, field, value)
+    db.commit()
+
+    return get_profile(user_id, db)

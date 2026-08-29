@@ -202,6 +202,16 @@ class ProfileContact(UserBase):
     verified_at: Optional[datetime] = None
 
 
+class ProfileContactPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: Optional[NonEmptyText] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    linkedin: Optional[str] = None
+    website: Optional[str] = None
+
+
 class MasterProfile(BaseModel):
     profile_version: str
     contact: ProfileContact
