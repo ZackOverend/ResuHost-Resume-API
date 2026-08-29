@@ -1,5 +1,16 @@
 from fastapi import FastAPI, Request
-from app.api import users, experiences, education, projects, activities, skill_categories, resume, snapshots, tailor
+from app.api import (
+    activities,
+    education,
+    experiences,
+    profile,
+    projects,
+    resume,
+    skill_categories,
+    snapshots,
+    tailor,
+    users,
+)
 from app.config import Settings, get_settings
 from app.errors import error_response, install_error_handlers, request_id_from
 
@@ -42,6 +53,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(resume.router)
     application.include_router(snapshots.router)
     application.include_router(tailor.router)
+    application.include_router(profile.router)
 
     @application.get("/")
     def root():

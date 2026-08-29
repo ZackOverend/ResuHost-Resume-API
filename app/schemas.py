@@ -25,6 +25,12 @@ class Experience(ExperienceBase):
 
     id: UUID
     user_id: UUID
+    sort_order: int
+    is_archived: bool
+    created_at: datetime
+    updated_at: datetime
+    archived_at: Optional[datetime] = None
+    verified_at: Optional[datetime] = None
 
 
 # ===== Education =====
@@ -44,6 +50,12 @@ class Education(EducationBase):
 
     id: UUID
     user_id: UUID
+    sort_order: int
+    is_archived: bool
+    created_at: datetime
+    updated_at: datetime
+    archived_at: Optional[datetime] = None
+    verified_at: Optional[datetime] = None
 
 
 # ===== Project =====
@@ -62,6 +74,12 @@ class Project(ProjectBase):
 
     id: UUID
     user_id: UUID
+    sort_order: int
+    is_archived: bool
+    created_at: datetime
+    updated_at: datetime
+    archived_at: Optional[datetime] = None
+    verified_at: Optional[datetime] = None
 
 
 # ===== Activity =====
@@ -80,6 +98,12 @@ class Activity(ActivityBase):
 
     id: UUID
     user_id: UUID
+    sort_order: int
+    is_archived: bool
+    created_at: datetime
+    updated_at: datetime
+    archived_at: Optional[datetime] = None
+    verified_at: Optional[datetime] = None
 
 
 # ===== SkillCategory =====
@@ -95,6 +119,12 @@ class SkillCategory(SkillCategoryBase):
 
     id: UUID
     user_id: UUID
+    sort_order: int
+    is_archived: bool
+    created_at: datetime
+    updated_at: datetime
+    archived_at: Optional[datetime] = None
+    verified_at: Optional[datetime] = None
 
 
 # ===== Resume Snapshot =====
@@ -153,6 +183,28 @@ class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+    created_at: datetime
+    updated_at: datetime
+    verified_at: Optional[datetime] = None
+    education: List[Education] = Field(default_factory=list)
+    experiences: List[Experience] = Field(default_factory=list)
+    projects: List[Project] = Field(default_factory=list)
+    activities: List[Activity] = Field(default_factory=list)
+    skill_categories: List[SkillCategory] = Field(default_factory=list)
+
+
+class ProfileContact(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+    verified_at: Optional[datetime] = None
+
+
+class MasterProfile(BaseModel):
+    profile_version: str
+    contact: ProfileContact
     education: List[Education] = Field(default_factory=list)
     experiences: List[Experience] = Field(default_factory=list)
     projects: List[Project] = Field(default_factory=list)
