@@ -1,35 +1,57 @@
-import os
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 from app.api import users, experiences, education, projects, activities, skill_categories, resume, snapshots, tailor
-
-app = FastAPI(title="Resume Generator API")
-
-API_SECRET_KEY = os.getenv("API_SECRET_KEY")
-
-@app.middleware("http")
-async def require_api_key(request: Request, call_next):
-    if request.url.path in ("/", "/health", "/docs", "/openapi.json", "/redoc"):
-        return await call_next(request)
-    if API_SECRET_KEY and request.headers.get("X-API-Key") != API_SECRET_KEY:
-        return JSONResponse({"detail": "Unauthorized"}, status_code=401)
-    return await call_next(request)
-
-app.include_router(users.router)
-app.include_router(experiences.router)
-app.include_router(education.router)
-app.include_router(projects.router)
-app.include_router(activities.router)
-app.include_router(skill_categories.router)
-app.include_router(resume.router)
-app.include_router(snapshots.router)
-app.include_router(tailor.router)
+from app.config import Settings, get_settings
+from app.errors import error_response, install_error_handlers, request_id_from
 
 
-@app.get("/")
-def root():
-    return {"message": "Resume Generator API", "docs": "/docs"}
+PUBLIC_PATHS = frozenset({"/", "/health", "/docs", "/openapi.json", "/redoc"})
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+
+def create_app(settings: Settings | None = None) -> FastAPI:
+    application = FastAPI(title="ResuHost Resume API")
+    app_settings = settings or get_settings()
+    install_error_handlers(application)
+
+    @application.middleware("http")
+    async def require_api_key(request: Request, call_next):
+        request.state.request_id = request_id_from(request)
+        if request.url.path in PUBLIC_PATHS:
+            response = await call_next(request)
+        elif (
+            app_settings.api_secret_key
+            and request.headers.get("X-API-Key") != app_settings.api_secret_key
+        ):
+            response = error_response(
+                request,
+                status_code=401,
+                code="unauthorized",
+                message="A valid API key is required",
+            )
+        else:
+            response = await call_next(request)
+
+        response.headers["X-Request-ID"] = request.state.request_id
+        return response
+
+    application.include_router(users.router)
+    application.include_router(experiences.router)
+    application.include_router(education.router)
+    application.include_router(projects.router)
+    application.include_router(activities.router)
+    application.include_router(skill_categories.router)
+    application.include_router(resume.router)
+    application.include_router(snapshots.router)
+    application.include_router(tailor.router)
+
+    @application.get("/")
+    def root():
+        return {"message": "ResuHost Resume API", "docs": "/docs"}
+
+    @application.get("/health")
+    def health():
+        return {"status": "ok"}
+
+    return application
+
+
+app = create_app()

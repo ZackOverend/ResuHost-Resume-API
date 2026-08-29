@@ -1,147 +1,146 @@
-import os
 from datetime import datetime
 from uuid import UUID
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 from typing import Any, Dict, List, Optional
+from typing_extensions import Annotated
+
+
+NonEmptyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
 
 # ===== Experience =====
 class ExperienceBase(BaseModel):
-    company: str
-    role: str
+    company: NonEmptyText
+    role: NonEmptyText
     location: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    bullets: List[str] = []
+    bullets: List[str] = Field(default_factory=list)
 
 class ExperienceCreate(ExperienceBase):
     pass
 
 class Experience(ExperienceBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     user_id: UUID
-
-    class Config:
-        from_attributes = True
 
 
 # ===== Education =====
 class EducationBase(BaseModel):
-    institution: str
+    institution: NonEmptyText
     degree: Optional[str] = None
     location: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    notes: List[str] = []
+    notes: List[str] = Field(default_factory=list)
 
 class EducationCreate(EducationBase):
     pass
 
 class Education(EducationBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     user_id: UUID
-
-    class Config:
-        from_attributes = True
 
 
 # ===== Project =====
 class ProjectBase(BaseModel):
-    name: str
+    name: NonEmptyText
     subtitle: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    bullets: List[str] = []
+    bullets: List[str] = Field(default_factory=list)
 
 class ProjectCreate(ProjectBase):
     pass
 
 class Project(ProjectBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     user_id: UUID
-
-    class Config:
-        from_attributes = True
 
 
 # ===== Activity =====
 class ActivityBase(BaseModel):
-    role: str
-    organization: str
+    role: NonEmptyText
+    organization: NonEmptyText
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    bullets: List[str] = []
+    bullets: List[str] = Field(default_factory=list)
 
 class ActivityCreate(ActivityBase):
     pass
 
 class Activity(ActivityBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     user_id: UUID
-
-    class Config:
-        from_attributes = True
 
 
 # ===== SkillCategory =====
 class SkillCategoryBase(BaseModel):
-    name: str
-    skills: List[str] = []
+    name: NonEmptyText
+    skills: List[str] = Field(default_factory=list)
 
 class SkillCategoryCreate(SkillCategoryBase):
     pass
 
 class SkillCategory(SkillCategoryBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     user_id: UUID
-
-    class Config:
-        from_attributes = True
 
 
 # ===== Resume Snapshot =====
 class ResumeSnapshotCreate(BaseModel):
-    label: str
+    label: NonEmptyText
 
 class ResumeSnapshot(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     user_id: UUID
     label: str
     created_at: datetime
     data: Dict[str, Any]
 
-    class Config:
-        from_attributes = True
-
-
 # ===== Tailor =====
 class TailorRequest(BaseModel):
-    job_description: str
-    model: str = os.getenv("OLLAMA_MODEL", "llama3")
-    host: str = os.getenv("OLLAMA_HOST", "http://host.docker.internal:11434")
-    api_key: str = os.getenv("OLLAMA_API_KEY", "ollama")
+    model_config = ConfigDict(extra="forbid")
+
+    job_description: Annotated[
+        str,
+        StringConstraints(strip_whitespace=True, min_length=50, max_length=50_000),
+    ]
+    model: Optional[str] = None
 
 class TailoredExperience(BaseModel):
     id: UUID
-    bullets: List[str]
+    bullets: List[str] = Field(default_factory=list)
 
 class TailoredProject(BaseModel):
     id: UUID
-    bullets: List[str]
+    bullets: List[str] = Field(default_factory=list)
 
 class TailoredActivity(BaseModel):
     id: UUID
-    bullets: List[str]
+    bullets: List[str] = Field(default_factory=list)
 
 class TailorResponse(BaseModel):
-    experiences: List[TailoredExperience]
-    projects: List[TailoredProject]
-    activities: List[TailoredActivity]
+    experiences: List[TailoredExperience] = Field(default_factory=list)
+    projects: List[TailoredProject] = Field(default_factory=list)
+    activities: List[TailoredActivity] = Field(default_factory=list)
 
 
 # ===== User =====
 class UserBase(BaseModel):
-    name: str
+    name: NonEmptyText
     email: EmailStr
     phone: Optional[str] = None
     linkedin: Optional[str] = None
@@ -151,12 +150,11 @@ class UserCreate(UserBase):
     pass
 
 class User(UserBase):
-    id: UUID
-    education: List[Education] = []
-    experiences: List[Experience] = []
-    projects: List[Project] = []
-    activities: List[Activity] = []
-    skill_categories: List[SkillCategory] = []
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+    id: UUID
+    education: List[Education] = Field(default_factory=list)
+    experiences: List[Experience] = Field(default_factory=list)
+    projects: List[Project] = Field(default_factory=list)
+    activities: List[Activity] = Field(default_factory=list)
+    skill_categories: List[SkillCategory] = Field(default_factory=list)

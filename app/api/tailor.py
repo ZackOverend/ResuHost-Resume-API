@@ -7,6 +7,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.config import get_settings
 from app.database import get_db
 
 router = APIRouter(prefix="/resume", tags=["tailor"])
@@ -54,9 +55,17 @@ async def tailor_resume(
             detail="User has no experiences, projects, or activities to tailor",
         )
 
-    provider = OpenAIProvider(base_url=f"{request.host}/v1", api_key=request.api_key)
+    settings = get_settings()
+    model_name = request.model or settings.ollama_model
+    if model_name not in settings.allowed_models:
+        raise HTTPException(status_code=400, detail="Requested model is not allowed")
+
+    provider = OpenAIProvider(
+        base_url=f"{settings.ollama_host}/v1",
+        api_key=settings.ollama_api_key,
+    )
     agent = Agent(
-        OpenAIChatModel(request.model, provider=provider),
+        OpenAIChatModel(model_name, provider=provider),
         output_type=schemas.TailorResponse,
         system_prompt=(
             "You are a professional resume writer. "

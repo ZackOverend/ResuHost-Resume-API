@@ -1,0 +1,9 @@
+ResuHost database migrations.
+
+For an existing database created with create_database.py, run:
+
+    alembic stamp 0001_initial
+
+For a new database, run:
+
+    alembic upgrade head

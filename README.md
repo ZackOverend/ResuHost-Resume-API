@@ -43,7 +43,7 @@ The default configuration starts a local Postgres container, so no changes are n
 docker compose up --build
 ```
 
-This builds the API image, starts the database, creates the tables, and launches the server. It's ready when you see `Application startup complete`.
+This builds the API image, starts the database, applies database migrations, and launches the server. Existing databases created before Alembic are safely adopted when their initial schema is complete. The API is ready when you see `Application startup complete`.
 
 **4. Open the API**
 
@@ -89,10 +89,10 @@ SUPABASE_DATABASE_URL=postgresql://postgres.[ref]:[password]@aws-0-[region].pool
 COMPOSE_PROFILES=supabase
 ```
 
-**3. Create tables**
+**3. Apply database migrations**
 
 ```bash
-python3 create_database.py
+alembic upgrade head
 ```
 
 **4. Run the server**
