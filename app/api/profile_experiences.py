@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.database import get_db
+from app.profile_records import verify_record
 
 
 router = APIRouter(
@@ -146,6 +147,16 @@ def restore_experience(
         db.commit()
         db.refresh(experience)
     return experience
+
+
+@router.post("/{experience_id}/verify", response_model=schemas.Experience)
+def verify_experience(
+    user_id: UUID,
+    experience_id: UUID,
+    db: Session = Depends(get_db),
+):
+    experience = _find_experience(db, user_id, experience_id)
+    return verify_record(db, experience)
 
 
 @router.delete("/{experience_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)

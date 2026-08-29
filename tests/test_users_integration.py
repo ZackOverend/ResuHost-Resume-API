@@ -39,6 +39,13 @@ def test_create_and_get_user(client, db_session):
     assert updated.json()["contact"]["phone"] == "555-0100"
     assert updated.json()["profile_version"] != profile.json()["profile_version"]
 
+    verified_contact = client.post(
+        f"/v1/users/{user_id}/profile/verify",
+        headers=headers,
+    )
+    assert verified_contact.status_code == 200
+    assert verified_contact.json()["contact"]["verified_at"] is not None
+
     experience = client.post(
         f"/v1/users/{user_id}/experiences",
         headers=headers,
@@ -59,6 +66,13 @@ def test_create_and_get_user(client, db_session):
     )
     assert patched_experience.status_code == 200
     assert patched_experience.json()["role"] == "Senior Engineer"
+
+    verified_experience = client.post(
+        f"/v1/users/{user_id}/experiences/{experience_id}/verify",
+        headers=headers,
+    )
+    assert verified_experience.status_code == 200
+    assert verified_experience.json()["verified_at"] is not None
 
     reordered = client.post(
         f"/v1/users/{user_id}/experiences/reorder",

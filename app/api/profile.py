@@ -1,5 +1,6 @@
 import hashlib
 import json
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -107,4 +108,14 @@ def update_profile(
         setattr(user, field, value)
     db.commit()
 
+    return get_profile(user_id, db)
+
+
+@router.post("/verify", response_model=schemas.MasterProfile)
+def verify_profile_contact(user_id: UUID, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.verified_at = datetime.now(UTC)
+    db.commit()
     return get_profile(user_id, db)

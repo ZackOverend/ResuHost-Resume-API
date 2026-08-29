@@ -13,6 +13,7 @@ from app.profile_records import (
     permanently_delete_record,
     reorder_records,
     restore_record,
+    verify_record,
 )
 
 
@@ -79,6 +80,12 @@ def restore_activity(
 ):
     record = find_record(db, models.Activity, user_id, activity_id, "Activity")
     return restore_record(db, models.Activity, user_id, record)
+
+
+@router.post("/{activity_id}/verify", response_model=schemas.Activity)
+def verify_activity(user_id: UUID, activity_id: UUID, db: Session = Depends(get_db)):
+    record = find_record(db, models.Activity, user_id, activity_id, "Activity")
+    return verify_record(db, record)
 
 
 @router.delete("/{activity_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)

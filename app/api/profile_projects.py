@@ -13,6 +13,7 @@ from app.profile_records import (
     permanently_delete_record,
     reorder_records,
     restore_record,
+    verify_record,
 )
 
 
@@ -79,6 +80,12 @@ def restore_project(
 ):
     record = find_record(db, models.Project, user_id, project_id, "Project")
     return restore_record(db, models.Project, user_id, record)
+
+
+@router.post("/{project_id}/verify", response_model=schemas.Project)
+def verify_project(user_id: UUID, project_id: UUID, db: Session = Depends(get_db)):
+    record = find_record(db, models.Project, user_id, project_id, "Project")
+    return verify_record(db, record)
 
 
 @router.delete("/{project_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)

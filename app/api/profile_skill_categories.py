@@ -13,6 +13,7 @@ from app.profile_records import (
     permanently_delete_record,
     reorder_records,
     restore_record,
+    verify_record,
 )
 
 
@@ -107,6 +108,18 @@ def restore_skill_category(
         "Skill category",
     )
     return restore_record(db, models.SkillCategory, user_id, record)
+
+
+@router.post("/{category_id}/verify", response_model=schemas.SkillCategory)
+def verify_skill_category(
+    user_id: UUID,
+    category_id: UUID,
+    db: Session = Depends(get_db),
+):
+    record = find_record(
+        db, models.SkillCategory, user_id, category_id, "Skill category"
+    )
+    return verify_record(db, record)
 
 
 @router.delete("/{category_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)

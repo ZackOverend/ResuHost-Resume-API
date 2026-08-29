@@ -96,6 +96,13 @@ def restore_record(db: Session, model: Any, user_id: UUID, record: Any):
     return record
 
 
+def verify_record(db: Session, record: Any):
+    record.verified_at = datetime.now(UTC)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
 def permanently_delete_record(db: Session, record: Any, label: str) -> None:
     if not record.is_archived:
         raise HTTPException(
