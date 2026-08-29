@@ -1,8 +1,11 @@
 from types import SimpleNamespace
 from uuid import UUID
 
+import pytest
+from pydantic import ValidationError
+
 from app.api.profile import _ordered, _profile_version
-from app.schemas import ProfileContactPatch
+from app.schemas import ExperiencePatch, ProfileContactPatch, ProfileReorder
 
 
 def test_profile_version_is_deterministic_for_equivalent_data():
@@ -34,3 +37,16 @@ def test_contact_patch_tracks_only_supplied_fields():
     patch = ProfileContactPatch(phone="555-0100")
 
     assert patch.model_dump(exclude_unset=True) == {"phone": "555-0100"}
+
+
+def test_experience_patch_tracks_only_supplied_fields():
+    patch = ExperiencePatch(role="Staff Engineer")
+
+    assert patch.model_dump(exclude_unset=True) == {"role": "Staff Engineer"}
+
+
+def test_reorder_rejects_duplicate_ids():
+    record_id = UUID(int=1)
+
+    with pytest.raises(ValidationError):
+        ProfileReorder(ids=[record_id, record_id])

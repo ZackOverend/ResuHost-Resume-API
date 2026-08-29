@@ -4,6 +4,7 @@ from app.api import (
     education,
     experiences,
     profile,
+    profile_experiences,
     projects,
     resume,
     skill_categories,
@@ -54,6 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(snapshots.router)
     application.include_router(tailor.router)
     application.include_router(profile.router)
+    application.include_router(profile_experiences.router)
 
     @application.get("/")
     def root():

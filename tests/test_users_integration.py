@@ -38,3 +38,45 @@ def test_create_and_get_user(client, db_session):
     assert updated.status_code == 200
     assert updated.json()["contact"]["phone"] == "555-0100"
     assert updated.json()["profile_version"] != profile.json()["profile_version"]
+
+    experience = client.post(
+        f"/v1/users/{user_id}/experiences",
+        headers=headers,
+        json={
+            "company": "Acme",
+            "role": "Engineer",
+            "start_date": "2025-01",
+            "is_current": True,
+        },
+    )
+    assert experience.status_code == 201
+    experience_id = experience.json()["id"]
+
+    patched_experience = client.patch(
+        f"/v1/users/{user_id}/experiences/{experience_id}",
+        headers=headers,
+        json={"role": "Senior Engineer"},
+    )
+    assert patched_experience.status_code == 200
+    assert patched_experience.json()["role"] == "Senior Engineer"
+
+    reordered = client.post(
+        f"/v1/users/{user_id}/experiences/reorder",
+        headers=headers,
+        json={"ids": [experience_id]},
+    )
+    assert reordered.status_code == 200
+
+    archived = client.post(
+        f"/v1/users/{user_id}/experiences/{experience_id}/archive",
+        headers=headers,
+    )
+    assert archived.status_code == 200
+    assert archived.json()["is_archived"] is True
+
+    restored = client.post(
+        f"/v1/users/{user_id}/experiences/{experience_id}/restore",
+        headers=headers,
+    )
+    assert restored.status_code == 200
+    assert restored.json()["is_archived"] is False

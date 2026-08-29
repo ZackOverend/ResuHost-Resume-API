@@ -33,6 +33,20 @@ class ExperienceBase(DateRange):
 class ExperienceCreate(ExperienceBase):
     pass
 
+
+class ExperiencePatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    company: Optional[NonEmptyText] = None
+    role: Optional[NonEmptyText] = None
+    location: Optional[str] = None
+    start_date: Optional[MonthText] = None
+    end_date: Optional[MonthText] = None
+    is_current: Optional[bool] = None
+    bullets: Optional[List[str]] = None
+    sort_order: Optional[int] = Field(default=None, ge=0)
+
+
 class Experience(ExperienceBase):
     model_config = ConfigDict(from_attributes=True)
 
@@ -44,6 +58,18 @@ class Experience(ExperienceBase):
     updated_at: datetime
     archived_at: Optional[datetime] = None
     verified_at: Optional[datetime] = None
+
+
+class ProfileReorder(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ids: List[UUID]
+
+    @model_validator(mode="after")
+    def validate_unique_ids(self):
+        if len(self.ids) != len(set(self.ids)):
+            raise ValueError("ids must not contain duplicates")
+        return self
 
 
 # ===== Education =====
