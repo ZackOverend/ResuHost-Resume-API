@@ -2,12 +2,39 @@
 
 **Owner:** Zack Overend  
 **Created:** 2026-08-29  
-**Status:** Draft, ready to begin Phase 0  
-**Version:** 0.1  
+**Status:** In implementation — Phase 0 API foundation complete  
+**Version:** 0.2  
 **Repositories:**
 
 - API: `/Users/zackaryoverend/Development/ResuHost-Resume-API`
 - Frontend: `/Users/zackaryoverend/Development/resuhost-resume-frontend`
+
+## Implementation Progress
+
+### 2026-08-29 — Phase 0 API foundation
+
+Completed:
+
+- Added Alembic with an initial schema migration.
+- Added safe adoption of complete pre-Alembic databases at the baseline revision.
+- Updated Docker startup and CI to apply migrations.
+- Added an application factory for isolated configuration and testing.
+- Added request IDs and consistent API error envelopes.
+- Moved model-provider host and credentials out of the tailoring request.
+- Added a server-side model allowlist and bounded job-description input.
+- Replaced mutable Pydantic collection defaults.
+- Added pytest infrastructure and initial app, schema, migration, and user CRUD coverage.
+
+Verification:
+
+- 15 tests pass locally.
+- 1 PostgreSQL CRUD integration test is skipped locally because `TEST_DATABASE_URL` is not configured.
+- CI supplies a disposable PostgreSQL service and is configured to run the integration test.
+- The initial Alembic revision renders successfully in offline SQL mode.
+
+Next vertical slice:
+
+- Complete the Phase 0 frontend API-client foundation, then begin the Master Profile aggregate API and workspace.
 
 ## Purpose
 
@@ -862,4 +889,3 @@ The personal release is complete when:
 - The critical end-to-end workflow passes automatically.
 
 Discovery, LaTeX, autofill, billing, and multi-user hosting are not required for this release.
-
