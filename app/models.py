@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -43,6 +43,12 @@ class User(Base):
     )
     resumes = relationship(
         "Resume", back_populates="user", cascade="all, delete-orphan"
+    )
+    tailoring_runs = relationship(
+        "TailoringRun", back_populates="user", cascade="all, delete-orphan"
+    )
+    resume_variants = relationship(
+        "ResumeVariant", back_populates="user", cascade="all, delete-orphan"
     )
 
 
@@ -159,3 +165,46 @@ class Resume(Base):
     data = Column(JSON, nullable=False)
 
     user = relationship("User", back_populates="resumes")
+
+
+class TailoringRun(Base):
+    __tablename__ = "tailoring_runs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    profile_version = Column(String(64), nullable=False)
+    job_description = Column(Text, nullable=False)
+    model = Column(String, nullable=False)
+    status = Column(String, nullable=False, default="pending", server_default="pending")
+    suggestions = Column(JSON, nullable=False, default=list, server_default="[]")
+    error_message = Column(Text)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    completed_at = Column(DateTime(timezone=True))
+
+    user = relationship("User", back_populates="tailoring_runs")
+    variants = relationship("ResumeVariant", back_populates="tailoring_run")
+
+
+class ResumeVariant(Base):
+    __tablename__ = "resume_variants"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    tailoring_run_id = Column(
+        UUID(as_uuid=True), ForeignKey("tailoring_runs.id"), nullable=True
+    )
+    label = Column(String, nullable=False)
+    profile_version = Column(String(64), nullable=False)
+    status = Column(String, nullable=False, default="draft", server_default="draft")
+    document = Column(JSON, nullable=False)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+    approved_at = Column(DateTime(timezone=True))
+
+    user = relationship("User", back_populates="resume_variants")
+    tailoring_run = relationship("TailoringRun", back_populates="variants")
