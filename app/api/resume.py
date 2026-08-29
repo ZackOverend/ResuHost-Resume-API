@@ -19,6 +19,15 @@ with open(template_path, "r") as f:
 
 
 def build_user_data(user) -> dict:
+    def active(records):
+        return sorted(
+            (record for record in records if not record.is_archived),
+            key=lambda record: (record.sort_order, str(record.id)),
+        )
+
+    def end_date(record):
+        return "Present" if getattr(record, "is_current", False) else record.end_date or ""
+
     return {
         "name": user.name,
         "email": user.email,
@@ -31,10 +40,10 @@ def build_user_data(user) -> dict:
                 "role": exp.role,
                 "location": exp.location or "",
                 "start_date": exp.start_date or "",
-                "end_date": exp.end_date or "",
+                "end_date": end_date(exp),
                 "bullets": exp.bullets or []
             }
-            for exp in user.experiences
+            for exp in active(user.experiences)
         ],
         "education": [
             {
@@ -42,37 +51,37 @@ def build_user_data(user) -> dict:
                 "degree": edu.degree or "",
                 "location": edu.location or "",
                 "start_date": edu.start_date or "",
-                "end_date": edu.end_date or "",
+                "end_date": end_date(edu),
                 "notes": edu.notes or []
             }
-            for edu in user.education
+            for edu in active(user.education)
         ],
         "projects": [
             {
                 "name": proj.name,
                 "subtitle": proj.subtitle or "",
                 "start_date": proj.start_date or "",
-                "end_date": proj.end_date or "",
+                "end_date": end_date(proj),
                 "bullets": proj.bullets or []
             }
-            for proj in user.projects
+            for proj in active(user.projects)
         ],
         "activities": [
             {
                 "role": act.role,
                 "organization": act.organization,
                 "start_date": act.start_date or "",
-                "end_date": act.end_date or "",
+                "end_date": end_date(act),
                 "bullets": act.bullets or []
             }
-            for act in user.activities
+            for act in active(user.activities)
         ],
         "skill_categories": [
             {
                 "name": sc.name,
                 "skills": sc.skills or []
             }
-            for sc in user.skill_categories
+            for sc in active(user.skill_categories)
         ],
     }
 
