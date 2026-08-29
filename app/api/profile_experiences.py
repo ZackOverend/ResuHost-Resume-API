@@ -105,6 +105,8 @@ def update_experience(
         setattr(experience, field, value)
     if "sort_order" in changes:
         experience.sort_order = changes["sort_order"]
+    if changes:
+        experience.verified_at = None
 
     db.commit()
     db.refresh(experience)

@@ -46,6 +46,14 @@ def test_create_and_get_user(client, db_session):
     assert verified_contact.status_code == 200
     assert verified_contact.json()["contact"]["verified_at"] is not None
 
+    changed_contact = client.patch(
+        f"/v1/users/{user_id}/profile",
+        headers=headers,
+        json={"phone": "555-0101"},
+    )
+    assert changed_contact.status_code == 200
+    assert changed_contact.json()["contact"]["verified_at"] is None
+
     experience = client.post(
         f"/v1/users/{user_id}/experiences",
         headers=headers,
@@ -73,6 +81,14 @@ def test_create_and_get_user(client, db_session):
     )
     assert verified_experience.status_code == 200
     assert verified_experience.json()["verified_at"] is not None
+
+    changed_experience = client.patch(
+        f"/v1/users/{user_id}/experiences/{experience_id}",
+        headers=headers,
+        json={"role": "Principal Engineer"},
+    )
+    assert changed_experience.status_code == 200
+    assert changed_experience.json()["verified_at"] is None
 
     reordered = client.post(
         f"/v1/users/{user_id}/experiences/reorder",

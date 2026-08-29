@@ -106,6 +106,8 @@ def update_profile(
 
     for field, value in changes.items():
         setattr(user, field, value)
+    if changes:
+        user.verified_at = None
     db.commit()
 
     return get_profile(user_id, db)

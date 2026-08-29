@@ -72,6 +72,8 @@ def apply_record_patch(
         setattr(record, field, value)
     if "sort_order" in changes:
         record.sort_order = changes["sort_order"]
+    if changes:
+        record.verified_at = None
     db.commit()
     db.refresh(record)
     return record
