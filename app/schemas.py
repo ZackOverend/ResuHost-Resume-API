@@ -82,6 +82,20 @@ class EducationBase(DateRange):
 class EducationCreate(EducationBase):
     pass
 
+
+class EducationPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    institution: Optional[NonEmptyText] = None
+    degree: Optional[str] = None
+    location: Optional[str] = None
+    start_date: Optional[MonthText] = None
+    end_date: Optional[MonthText] = None
+    is_current: Optional[bool] = None
+    notes: Optional[List[str]] = None
+    sort_order: Optional[int] = Field(default=None, ge=0)
+
+
 class Education(EducationBase):
     model_config = ConfigDict(from_attributes=True)
 

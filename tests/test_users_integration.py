@@ -80,3 +80,31 @@ def test_create_and_get_user(client, db_session):
     )
     assert restored.status_code == 200
     assert restored.json()["is_archived"] is False
+
+    education = client.post(
+        f"/v1/users/{user_id}/education",
+        headers=headers,
+        json={
+            "institution": "Example University",
+            "degree": "BSc",
+            "start_date": "2021-09",
+            "end_date": "2025-05",
+        },
+    )
+    assert education.status_code == 201
+    education_id = education.json()["id"]
+
+    patched_education = client.patch(
+        f"/v1/users/{user_id}/education/{education_id}",
+        headers=headers,
+        json={"degree": "BSc Computer Science"},
+    )
+    assert patched_education.status_code == 200
+    assert patched_education.json()["degree"] == "BSc Computer Science"
+
+    archived_education = client.post(
+        f"/v1/users/{user_id}/education/{education_id}/archive",
+        headers=headers,
+    )
+    assert archived_education.status_code == 200
+    assert archived_education.json()["is_archived"] is True
