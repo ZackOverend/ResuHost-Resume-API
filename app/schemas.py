@@ -187,6 +187,15 @@ class SkillCategoryBase(BaseModel):
 class SkillCategoryCreate(SkillCategoryBase):
     pass
 
+
+class SkillCategoryPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: Optional[NonEmptyText] = None
+    skills: Optional[List[str]] = None
+    sort_order: Optional[int] = Field(default=None, ge=0)
+
+
 class SkillCategory(SkillCategoryBase):
     model_config = ConfigDict(from_attributes=True)
 
