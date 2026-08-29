@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ARRAY, JSON, Column, DateTime, ForeignKey, String
+from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -17,6 +17,14 @@ class User(Base):
     phone = Column(String)
     linkedin = Column(String)
     website = Column(String)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+    verified_at = Column(DateTime(timezone=True))
 
     education = relationship(
         "Education", back_populates="user", cascade="all, delete-orphan"
@@ -49,6 +57,12 @@ class Education(Base):
     start_date = Column(String)
     end_date = Column(String)
     notes = Column(ARRAY(String))
+    sort_order = Column(Integer, nullable=False, default=0, server_default="0")
+    is_archived = Column(Boolean, nullable=False, default=False, server_default="false")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    archived_at = Column(DateTime(timezone=True))
+    verified_at = Column(DateTime(timezone=True))
 
     user = relationship("User", back_populates="education")
 
@@ -64,6 +78,12 @@ class Experience(Base):
     start_date = Column(String)
     end_date = Column(String)
     bullets = Column(ARRAY(String))
+    sort_order = Column(Integer, nullable=False, default=0, server_default="0")
+    is_archived = Column(Boolean, nullable=False, default=False, server_default="false")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    archived_at = Column(DateTime(timezone=True))
+    verified_at = Column(DateTime(timezone=True))
 
     user = relationship("User", back_populates="experiences")
 
@@ -78,6 +98,12 @@ class Project(Base):
     start_date = Column(String)
     end_date = Column(String)
     bullets = Column(ARRAY(String))
+    sort_order = Column(Integer, nullable=False, default=0, server_default="0")
+    is_archived = Column(Boolean, nullable=False, default=False, server_default="false")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    archived_at = Column(DateTime(timezone=True))
+    verified_at = Column(DateTime(timezone=True))
 
     user = relationship("User", back_populates="projects")
 
@@ -92,6 +118,12 @@ class Activity(Base):
     start_date = Column(String)
     end_date = Column(String)
     bullets = Column(ARRAY(String))
+    sort_order = Column(Integer, nullable=False, default=0, server_default="0")
+    is_archived = Column(Boolean, nullable=False, default=False, server_default="false")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    archived_at = Column(DateTime(timezone=True))
+    verified_at = Column(DateTime(timezone=True))
 
     user = relationship("User", back_populates="activities")
 
@@ -103,6 +135,12 @@ class SkillCategory(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)
     skills = Column(ARRAY(String))
+    sort_order = Column(Integer, nullable=False, default=0, server_default="0")
+    is_archived = Column(Boolean, nullable=False, default=False, server_default="false")
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    archived_at = Column(DateTime(timezone=True))
+    verified_at = Column(DateTime(timezone=True))
 
     user = relationship("User", back_populates="skill_categories")
 
