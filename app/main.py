@@ -6,6 +6,7 @@ from app.api import (
     profile,
     profile_education,
     profile_experiences,
+    profile_projects,
     projects,
     resume,
     skill_categories,
@@ -58,6 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(profile.router)
     application.include_router(profile_education.router)
     application.include_router(profile_experiences.router)
+    application.include_router(profile_projects.router)
 
     @application.get("/")
     def root():

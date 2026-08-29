@@ -118,6 +118,19 @@ class ProjectBase(DateRange):
 class ProjectCreate(ProjectBase):
     pass
 
+
+class ProjectPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: Optional[NonEmptyText] = None
+    subtitle: Optional[str] = None
+    start_date: Optional[MonthText] = None
+    end_date: Optional[MonthText] = None
+    is_current: Optional[bool] = None
+    bullets: Optional[List[str]] = None
+    sort_order: Optional[int] = Field(default=None, ge=0)
+
+
 class Project(ProjectBase):
     model_config = ConfigDict(from_attributes=True)
 

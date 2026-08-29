@@ -5,7 +5,13 @@ import pytest
 from pydantic import ValidationError
 
 from app.api.profile import _ordered, _profile_version
-from app.schemas import EducationPatch, ExperiencePatch, ProfileContactPatch, ProfileReorder
+from app.schemas import (
+    EducationPatch,
+    ExperiencePatch,
+    ProfileContactPatch,
+    ProfileReorder,
+    ProjectPatch,
+)
 
 
 def test_profile_version_is_deterministic_for_equivalent_data():
@@ -49,6 +55,12 @@ def test_education_patch_tracks_only_supplied_fields():
     patch = EducationPatch(degree="BSc")
 
     assert patch.model_dump(exclude_unset=True) == {"degree": "BSc"}
+
+
+def test_project_patch_tracks_only_supplied_fields():
+    patch = ProjectPatch(subtitle="Compiler project")
+
+    assert patch.model_dump(exclude_unset=True) == {"subtitle": "Compiler project"}
 
 
 def test_reorder_rejects_duplicate_ids():
