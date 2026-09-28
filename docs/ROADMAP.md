@@ -3,7 +3,7 @@
 **Owner:** Zack Overend  
 **Created:** 2026-08-29  
 **Status:** In implementation — Phase 2 backend in progress
-**Version:** 0.6
+**Version:** 0.7
 **Repositories:**
 
 - API: `/Users/zackaryoverend/Development/ResuHost-Resume-API`
@@ -124,8 +124,26 @@ Verification:
 - 43 backend tests pass locally.
 - 1 PostgreSQL integration test is skipped locally because `TEST_DATABASE_URL` is not configured.
 
+### 2026-09-28 — Phase 2 API hardening
+
+Completed:
+
+- Moved suggestion identity to the server: the model references bullets by short labels (`b1`, `b2`, ...), and the API assigns suggestion IDs, source hashes, and original text.
+- Discarded proposals with unknown bullet labels or unchanged text instead of failing the whole run.
+- Fixed verification of bullets that follow a blank bullet by locating them by source index rather than list position.
+- Rejected variant requests that select more than one change for the same source bullet.
+- Added deterministic checks for newly introduced named terms (technologies, employers, titles, months) and credential language, using the source bullet and its entry as evidence.
+- Made tailoring runs use application-injected settings.
+- Added PostgreSQL integration coverage for the tailoring-run, variant, approval, and PDF lifecycle.
+
+Verification:
+
+- 65 backend tests pass locally against a disposable PostgreSQL database.
+
+Known limitations:
+
+- Named-term detection is heuristic: capitalized words that begin a sentence are not checked, and numbers written as words are not treated as metrics.
+
 In progress:
 
-- Extend deterministic verification to named technologies, credentials, employers, titles, and dates.
-- Add PostgreSQL integration coverage for the complete tailoring-run and variant lifecycle.
 - Migrate the frontend review flow before removing the destructive legacy `apply-tailor` endpoint.
