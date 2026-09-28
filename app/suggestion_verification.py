@@ -42,7 +42,11 @@ def verify_suggestion(
                     message="The suggestion is assigned to the wrong resume section.",
                 )
             )
-        if candidate.source_index >= len(entry.bullets):
+        bullet = next(
+            (item for item in entry.bullets if item.source_index == candidate.source_index),
+            None,
+        )
+        if bullet is None:
             issues.append(
                 schemas.SuggestionVerificationIssue(
                     code="missing_source_bullet",
@@ -50,7 +54,6 @@ def verify_suggestion(
                 )
             )
         else:
-            bullet = entry.bullets[candidate.source_index]
             if bullet.source_hash != candidate.source_hash:
                 issues.append(
                     schemas.SuggestionVerificationIssue(
