@@ -1,5 +1,7 @@
 from uuid import UUID
 
+import pytest
+
 from app import schemas
 from app.resume_documents import source_hash
 from app.suggestion_verification import verify_suggestion
@@ -23,6 +25,7 @@ def document():
                     schemas.ResumeDocumentEntry(
                         source_entry_id=ENTRY_ID,
                         heading="Engineer",
+                        subheading="Acme",
                         bullets=[
                             schemas.ResumeDocumentBullet(
                                 text=TEXT,
@@ -87,3 +90,45 @@ def test_stale_hash_and_wrong_entry_assignment_fail_verification():
         "wrong_section",
         "stale_source_hash",
     }
+
+
+def issue_codes(proposed_text):
+    result = verify_suggestion(candidate(proposed_text=proposed_text), document())
+    return {issue.code for issue in result.verification.issues}, result
+
+
+@pytest.mark.parametrize(
+    ("proposed_text", "term"),
+    [
+        ("Reduced processing time by 30% using Kubernetes.", "Kubernetes"),
+        ("Reduced AWS processing time by 30%.", "AWS"),
+        ("Reduced processing time by 30% with Node.js.", "Node.js"),
+        ("Reduced processing time by 30% as Senior Engineer.", "Senior"),
+        ("Reduced processing time by 30% in March.", "March"),
+    ],
+)
+def test_new_named_terms_fail_verification(proposed_text, term):
+    codes, result = issue_codes(proposed_text)
+
+    assert codes == {"introduced_named_term"}
+    assert f"{term}." in result.verification.issues[0].message
+
+
+@pytest.mark.parametrize(
+    "proposed_text",
+    [
+        "Reduced Acme processing time by 30%.",
+        "Engineer who reduced processing time by 30%.",
+        "Streamlined workflows. Reduced processing time by 30%.",
+    ],
+)
+def test_terms_from_the_source_entry_pass_verification(proposed_text):
+    codes, _ = issue_codes(proposed_text)
+
+    assert codes == set()
+
+
+def test_new_credential_language_fails_verification():
+    codes, _ = issue_codes("As a certified engineer, reduced processing time by 30%.")
+
+    assert codes == {"introduced_credential"}

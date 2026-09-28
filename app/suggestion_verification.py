@@ -9,9 +9,44 @@ METRIC_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+TERM_PATTERN = re.compile(r"[A-Za-z][A-Za-z0-9+#]*(?:[.\-/][A-Za-z0-9+#]+)*")
+CREDENTIAL_PATTERN = re.compile(
+    r"\b(?:certified|certification|certificate|licensed|accredited|patent(?:ed)?|"
+    r"award(?:ed)?|ph\.?d|mba)\b",
+    re.IGNORECASE,
+)
+
 
 def _metrics(text: str) -> set[str]:
     return {match.group(0).lower().replace(" ", "") for match in METRIC_PATTERN.finditer(text)}
+
+
+def _starts_sentence(text: str, position: int) -> bool:
+    preceding = text[:position].rstrip()
+    return not preceding or preceding.endswith((".", "!", "?", ":", ";"))
+
+
+def _named_terms(text: str) -> set[str]:
+    """Proper nouns, acronyms, and technology names, skipping sentence-initial words."""
+    terms = set()
+    for match in TERM_PATTERN.finditer(text):
+        term = match.group(0)
+        if len(term) < 2:
+            continue
+        distinctive = any(char.isupper() for char in term[1:]) or any(
+            char.isdigit() or char in "+#" for char in term
+        )
+        if distinctive or (term[0].isupper() and not _starts_sentence(text, match.start())):
+            terms.add(term)
+    return terms
+
+
+def _words(text: str) -> set[str]:
+    return {match.group(0).lower() for match in TERM_PATTERN.finditer(text)}
+
+
+def _credentials(text: str) -> set[str]:
+    return {match.group(0).lower() for match in CREDENTIAL_PATTERN.finditer(text)}
 
 
 def verify_suggestion(
@@ -68,6 +103,42 @@ def verify_suggestion(
                         message="The suggestion does not preserve the referenced source text.",
                     )
                 )
+
+    evidence = candidate.original_text
+    if source is not None:
+        entry = source[1]
+        evidence = " ".join(
+            filter(None, [candidate.original_text, entry.heading, entry.subheading, entry.location])
+        )
+    evidence_words = _words(evidence)
+
+    introduced_terms = sorted(
+        term for term in _named_terms(candidate.proposed_text) if term.lower() not in evidence_words
+    )
+    if introduced_terms:
+        issues.append(
+            schemas.SuggestionVerificationIssue(
+                code="introduced_named_term",
+                message=(
+                    "The proposed text introduces names or terms not found in the source entry: "
+                    + ", ".join(introduced_terms)
+                    + "."
+                ),
+            )
+        )
+
+    introduced_credentials = _credentials(candidate.proposed_text) - _credentials(evidence)
+    if introduced_credentials:
+        issues.append(
+            schemas.SuggestionVerificationIssue(
+                code="introduced_credential",
+                message=(
+                    "The proposed text introduces unsupported credential language: "
+                    + ", ".join(sorted(introduced_credentials))
+                    + "."
+                ),
+            )
+        )
 
     introduced_metrics = _metrics(candidate.proposed_text) - _metrics(
         candidate.original_text

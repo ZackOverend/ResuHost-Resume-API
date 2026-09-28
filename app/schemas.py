@@ -362,6 +362,8 @@ class SuggestionVerificationIssue(BaseModel):
         "stale_source_hash",
         "source_text_changed",
         "introduced_metric",
+        "introduced_named_term",
+        "introduced_credential",
     ]
     message: NonEmptyText
 
