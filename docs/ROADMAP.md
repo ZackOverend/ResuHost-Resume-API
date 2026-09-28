@@ -2,7 +2,7 @@
 
 **Owner:** Zack Overend  
 **Created:** 2026-08-29  
-**Status:** In implementation — Phase 2 backend in progress
+**Status:** In implementation — Phase 2 complete pending merge
 **Version:** 0.7
 **Repositories:**
 
@@ -147,3 +147,24 @@ Known limitations:
 In progress:
 
 - Migrate the frontend review flow before removing the destructive legacy `apply-tailor` endpoint.
+
+### 2026-09-28 — Phase 2 frontend migration
+
+Completed:
+
+- Replaced the all-at-once tailored display with an explicit review workflow grouped per source bullet.
+- Added per-suggestion accept, edit, and reject actions; choosing an alternative for a bullet rejects the previously chosen one.
+- Disabled accepting suggestions that fail deterministic verification and showed the verification issues inline.
+- Restricted accept-all to verified suggestions, picking at most one change per source bullet.
+- Added draft variant creation, preview, approval, and PDF download through allowlisted route handlers.
+- Removed the destructive demo tailoring routes, the `apply-tailor` master-mutation flow, and the legacy `/resume/{id}/tailor` and `apply-tailor` API endpoints.
+
+Verification:
+
+- 31 frontend tests pass; TypeScript, the production build, and targeted lint are clean.
+- End-to-end API check with a stubbed model provider: run creation, grouped alternatives, failing-suggestion rejection at variant creation, accept/edit/reject variant creation, approval, PDF export, and unchanged master-profile bullets all behave as specified.
+- The interactive browser pass of `/tailor` was not completed: the frontend dev server repeatedly exhausted memory on the review machine. UI interactions remain covered by the frontend test suite.
+
+Remaining:
+
+- Decide whether the Phase 2 acceptance gate is met and merge both branches.
