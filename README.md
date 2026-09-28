@@ -4,6 +4,8 @@
 
 A FastAPI backend for managing resume data and generating PDF resumes via a Jinja2 HTML template and WeasyPrint.
 
+Project status, architecture, and phased delivery plans are available in the [documentation index](docs/README.md).
+
 ## Stack
 
 - **FastAPI** — REST API
