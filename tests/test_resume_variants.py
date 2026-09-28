@@ -42,9 +42,12 @@ def source_document():
     )
 
 
-def suggestion(proposed_text="Cut processing time by 30% through optimization."):
+def suggestion(
+    proposed_text="Cut processing time by 30% through optimization.",
+    suggestion_id=SUGGESTION_ID,
+):
     return schemas.TailoringSuggestion(
-        id=SUGGESTION_ID,
+        id=suggestion_id,
         section="experience",
         entry_id=ENTRY_ID,
         source_index=0,
@@ -57,9 +60,9 @@ def suggestion(proposed_text="Cut processing time by 30% through optimization.")
     )
 
 
-def decision(action="accept", edited_text=None):
+def decision(action="accept", edited_text=None, suggestion_id=SUGGESTION_ID):
     return schemas.VariantSuggestionDecision(
-        suggestion_id=SUGGESTION_ID,
+        suggestion_id=suggestion_id,
         action=action,
         edited_text=edited_text,
     )
@@ -91,6 +94,33 @@ def test_edited_suggestion_is_verified_again():
         )
 
     assert error.value.status_code == 422
+
+
+def test_variant_rejects_two_changes_to_the_same_bullet():
+    other_id = UUID(int=3)
+    suggestions = [suggestion(), suggestion("Sped up processing by 30%.", suggestion_id=other_id)]
+
+    with pytest.raises(HTTPException) as error:
+        create_variant_document(
+            source_document(),
+            suggestions,
+            [decision(), decision(suggestion_id=other_id)],
+        )
+
+    assert error.value.status_code == 422
+
+
+def test_rejected_alternative_does_not_conflict():
+    other_id = UUID(int=3)
+    suggestions = [suggestion(), suggestion("Sped up processing by 30%.", suggestion_id=other_id)]
+
+    variant = create_variant_document(
+        source_document(),
+        suggestions,
+        [decision(), decision(action="reject", suggestion_id=other_id)],
+    )
+
+    assert variant.sections[0].entries[0].bullets[0].text.startswith("Cut processing")
 
 
 def test_edit_decision_requires_edited_text():

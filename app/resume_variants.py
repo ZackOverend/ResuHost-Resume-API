@@ -17,6 +17,7 @@ def create_variant_document(
         for entry in section.entries
         for bullet in entry.bullets
     }
+    changed: set[tuple] = set()
 
     for decision in decisions:
         suggestion = suggestions_by_id.get(decision.suggestion_id)
@@ -40,6 +41,12 @@ def create_variant_document(
                 },
             )
         key = (suggestion.section, suggestion.entry_id, suggestion.source_index)
+        if key in changed:
+            raise HTTPException(
+                status_code=422,
+                detail="Only one suggestion may be selected for each source bullet",
+            )
+        changed.add(key)
         bullet = bullets.get(key)
         if bullet is None:
             raise HTTPException(status_code=422, detail="Suggestion source is not in the resume document")
