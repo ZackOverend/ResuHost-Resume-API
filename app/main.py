@@ -14,6 +14,7 @@ from app.api import (
     skill_categories,
     snapshots,
     tailor,
+    tailoring_runs,
     users,
 )
 from app.config import Settings, get_settings
@@ -58,6 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.include_router(resume.router)
     application.include_router(snapshots.router)
     application.include_router(tailor.router)
+    application.include_router(tailoring_runs.router)
     application.include_router(profile.router)
     application.include_router(profile_activities.router)
     application.include_router(profile_education.router)

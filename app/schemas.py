@@ -1,6 +1,14 @@
 from datetime import datetime
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    StringConstraints,
+    field_validator,
+    model_validator,
+)
 from typing import Any, Dict, List, Literal, Optional
 from typing_extensions import Annotated
 
@@ -379,3 +387,75 @@ class TailoringSuggestionCandidate(BaseModel):
 
 class TailoringSuggestion(TailoringSuggestionCandidate):
     verification: SuggestionVerification
+
+
+class TailoringRunCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    job_description: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=20_000)]
+    model: Optional[NonEmptyText] = None
+
+
+class TailoringSuggestionCandidates(BaseModel):
+    suggestions: List[TailoringSuggestionCandidate] = Field(default_factory=list)
+
+
+class TailoringRunResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_id: UUID
+    profile_version: str
+    job_description: str
+    model: str
+    status: Literal["pending", "completed", "failed"]
+    suggestions: List[TailoringSuggestion] = Field(default_factory=list)
+    error_message: Optional[str] = None
+    created_at: datetime
+    completed_at: Optional[datetime] = None
+
+
+class VariantSuggestionDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    suggestion_id: UUID
+    action: Literal["accept", "edit", "reject"]
+    edited_text: Optional[NonEmptyText] = None
+
+    @model_validator(mode="after")
+    def validate_edited_text(self):
+        if self.action == "edit" and self.edited_text is None:
+            raise ValueError("edited_text is required when action is edit")
+        if self.action != "edit" and self.edited_text is not None:
+            raise ValueError("edited_text is only allowed when action is edit")
+        return self
+
+
+class ResumeVariantCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    label: NonEmptyText
+    decisions: List[VariantSuggestionDecision]
+
+    @field_validator("decisions")
+    @classmethod
+    def decisions_must_be_unique(cls, decisions):
+        ids = [decision.suggestion_id for decision in decisions]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Each suggestion may be reviewed only once")
+        return decisions
+
+
+class ResumeVariantResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    user_id: UUID
+    tailoring_run_id: Optional[UUID] = None
+    label: str
+    profile_version: str
+    status: Literal["draft", "approved"]
+    document: ResumeDocument
+    created_at: datetime
+    updated_at: datetime
+    approved_at: Optional[datetime] = None
