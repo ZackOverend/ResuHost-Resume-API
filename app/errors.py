@@ -35,7 +35,12 @@ def install_error_handlers(app: FastAPI) -> None:
         request: Request, exc: StarletteHTTPException
     ) -> JSONResponse:
         detail = exc.detail
-        message = detail if isinstance(detail, str) else "Request failed"
+        if isinstance(detail, str):
+            message = detail
+        elif isinstance(detail, dict) and isinstance(detail.get("message"), str):
+            message = detail["message"]
+        else:
+            message = "Request failed"
         return error_response(
             request,
             status_code=exc.status_code,

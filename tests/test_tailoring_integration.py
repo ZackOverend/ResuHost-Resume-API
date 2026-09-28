@@ -93,6 +93,8 @@ def test_tailoring_lifecycle_never_changes_the_master_profile(
         },
     )
     assert failing.status_code == 422
+    assert "Kubernetes" in failing.json()["error"]["message"]
+    assert failing.json()["error"]["details"]["suggestion_id"] == suggestions[2]["id"]
 
     variant = client.post(
         f"/v1/tailoring-runs/{body['id']}/variants",

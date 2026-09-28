@@ -35,7 +35,8 @@ def create_variant_document(
             raise HTTPException(
                 status_code=422,
                 detail={
-                    "message": "A selected suggestion failed verification",
+                    "message": "A selected suggestion failed verification: "
+                    + " ".join(issue.message for issue in verified.verification.issues),
                     "suggestion_id": str(suggestion.id),
                     "issues": [issue.model_dump() for issue in verified.verification.issues],
                 },
