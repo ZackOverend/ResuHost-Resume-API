@@ -27,6 +27,7 @@ PUBLIC_PATHS = frozenset({"/", "/health", "/docs", "/openapi.json", "/redoc"})
 def create_app(settings: Settings | None = None) -> FastAPI:
     application = FastAPI(title="ResuHost Resume API")
     app_settings = settings or get_settings()
+    application.state.settings = app_settings
     install_error_handlers(application)
 
     @application.middleware("http")

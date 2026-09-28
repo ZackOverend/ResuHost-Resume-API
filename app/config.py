@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from dotenv import load_dotenv
+from fastapi import Request
 
 
 load_dotenv()
@@ -37,3 +38,7 @@ def get_settings() -> Settings:
         ollama_api_key=os.getenv("OLLAMA_API_KEY", "ollama"),
         allowed_models=frozenset(configured_models),
     )
+
+
+def get_request_settings(request: Request) -> Settings:
+    return request.app.state.settings

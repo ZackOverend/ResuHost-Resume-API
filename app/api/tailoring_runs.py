@@ -3,19 +3,16 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
-from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIChatModel
-from pydantic_ai.providers.openai import OpenAIProvider
 from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.api.profile import get_profile
 from app.api.resume import render_pdf
-from app.config import get_settings
+from app.config import Settings, get_request_settings
 from app.database import get_db
 from app.resume_documents import build_resume_document
 from app.resume_variants import create_variant_document
-from app.suggestion_verification import verify_suggestion
+from app.tailoring import build_tailoring_agent, resolve_proposals, tailoring_prompt
 
 
 router = APIRouter(prefix="/v1", tags=["tailoring"])
@@ -96,12 +93,12 @@ async def create_tailoring_run(
     user_id: UUID,
     request: schemas.TailoringRunCreate,
     db: Session = Depends(get_db),
+    settings: Settings = Depends(get_request_settings),
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    settings = get_settings()
     model_name = request.model or settings.ollama_model
     if model_name not in settings.allowed_models:
         raise HTTPException(status_code=400, detail="Requested model is not allowed")
@@ -123,24 +120,12 @@ async def create_tailoring_run(
     db.commit()
     db.refresh(run)
 
-    provider = OpenAIProvider(base_url=f"{settings.ollama_host}/v1", api_key=settings.ollama_api_key)
-    agent = Agent(
-        OpenAIChatModel(model_name, provider=provider),
-        output_type=schemas.TailoringSuggestionCandidates,
-        system_prompt=(
-            "Propose truthful resume bullet edits grounded only in the supplied resume document. "
-            "Preserve every source identity field exactly. Do not introduce facts, metrics, "
-            "technologies, credentials, employers, titles, or dates that are not in the source."
-        ),
-    )
+    agent = build_tailoring_agent(settings, model_name)
     try:
-        result = await agent.run(
-            f"Job description:\n{request.job_description}\n\n"
-            f"Resume document:\n{document.model_dump_json()}"
-        )
+        result = await agent.run(tailoring_prompt(request.job_description, document))
         run.suggestions = [
-            verify_suggestion(candidate, document).model_dump(mode="json")
-            for candidate in result.output.suggestions
+            suggestion.model_dump(mode="json")
+            for suggestion in resolve_proposals(result.output.suggestions, document)
         ]
         run.status = "completed"
         run.completed_at = datetime.now(UTC)

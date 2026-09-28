@@ -396,8 +396,15 @@ class TailoringRunCreate(BaseModel):
     model: Optional[NonEmptyText] = None
 
 
-class TailoringSuggestionCandidates(BaseModel):
-    suggestions: List[TailoringSuggestionCandidate] = Field(default_factory=list)
+class TailoringProposal(BaseModel):
+    bullet_ref: NonEmptyText
+    proposed_text: NonEmptyText
+    reason: NonEmptyText
+    matched_requirements: List[str] = Field(default_factory=list)
+
+
+class TailoringProposals(BaseModel):
+    suggestions: List[TailoringProposal] = Field(default_factory=list)
 
 
 class TailoringRunResponse(BaseModel):
