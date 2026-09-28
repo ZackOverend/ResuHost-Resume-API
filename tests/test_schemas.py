@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.schemas import ExperienceCreate, TailorRequest, UserCreate
+from app.schemas import ExperienceCreate, TailoringRunCreate, UserCreate
 
 
 def test_collection_defaults_are_independent():
@@ -19,15 +19,15 @@ def test_required_text_is_trimmed():
     assert user.name == "Zack"
 
 
-@pytest.mark.parametrize("length", [0, 49, 50_001])
-def test_job_description_length_is_bounded(length):
+@pytest.mark.parametrize("job_description", ["", "   ", "x" * 20_001])
+def test_job_description_length_is_bounded(job_description):
     with pytest.raises(ValidationError):
-        TailorRequest(job_description="x" * length)
+        TailoringRunCreate(job_description=job_description)
 
 
-def test_tailor_request_does_not_accept_provider_credentials():
+def test_tailoring_run_does_not_accept_provider_credentials():
     with pytest.raises(ValidationError):
-        TailorRequest(
+        TailoringRunCreate(
             job_description="x" * 50,
             host="http://attacker.invalid",
             api_key="not-allowed",

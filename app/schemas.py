@@ -230,34 +230,6 @@ class ResumeSnapshot(BaseModel):
     created_at: datetime
     data: Dict[str, Any]
 
-# ===== Tailor =====
-class TailorRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    job_description: Annotated[
-        str,
-        StringConstraints(strip_whitespace=True, min_length=50, max_length=50_000),
-    ]
-    model: Optional[str] = None
-
-class TailoredExperience(BaseModel):
-    id: UUID
-    bullets: List[str] = Field(default_factory=list)
-
-class TailoredProject(BaseModel):
-    id: UUID
-    bullets: List[str] = Field(default_factory=list)
-
-class TailoredActivity(BaseModel):
-    id: UUID
-    bullets: List[str] = Field(default_factory=list)
-
-class TailorResponse(BaseModel):
-    experiences: List[TailoredExperience] = Field(default_factory=list)
-    projects: List[TailoredProject] = Field(default_factory=list)
-    activities: List[TailoredActivity] = Field(default_factory=list)
-
-
 # ===== User =====
 class UserBase(BaseModel):
     name: NonEmptyText

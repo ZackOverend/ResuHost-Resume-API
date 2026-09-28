@@ -109,7 +109,7 @@ API docs available at `http://localhost:2002/docs`.
 
 ## Ollama (AI tailoring)
 
-The `/resume/{user_id}/tailor` endpoint uses Ollama to rewrite resume bullets for a given job description. Configure it via `.env` or by passing values directly in the request body.
+The `POST /v1/users/{user_id}/tailoring-runs` endpoint uses Ollama to suggest resume bullet edits for a given job description. Configure the provider via `.env`; requests cannot supply provider hosts or credentials.
 
 ### Environment variables
 
@@ -129,6 +129,7 @@ The `/resume/{user_id}/tailor` endpoint uses Ollama to rewrite resume bullets fo
 | `OLLAMA_HOST` | `http://host.docker.internal:11434` | URL of your Ollama instance |
 | `OLLAMA_MODEL` | `qwen3.5:cloud` | Model to use |
 | `OLLAMA_API_KEY` | `ollama` | API key (only required for Ollama Cloud) |
+| `OLLAMA_ALLOWED_MODELS` | `OLLAMA_MODEL` | Comma-separated models a request may select with `model` |
 
 ### Deployment options
 
@@ -153,7 +154,7 @@ OLLAMA_API_KEY=your_ollama_api_key
 OLLAMA_HOST=http://your-server-ip:11434
 ```
 
-All values can also be overridden per-request in the `POST /resume/{user_id}/tailor` request body.
+A request may choose a different model only if it is listed in `OLLAMA_ALLOWED_MODELS`.
 
 ---
 
@@ -217,9 +218,19 @@ All values can also be overridden per-request in the `POST /resume/{user_id}/tai
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/resume/{user_id}` | Generate PDF (`?snapshot_id=` optional) |
-| POST | `/resume/{user_id}/tailor` | AI-tailor bullets to a job description |
-| PATCH | `/resume/{user_id}/apply-tailor` | Write tailored bullets back to DB |
 | POST | `/users/{user_id}/resumes/` | Save resume snapshot |
 | GET | `/users/{user_id}/resumes/` | List snapshots |
 | GET | `/users/{user_id}/resumes/{resume_id}` | Get snapshot |
 | DELETE | `/users/{user_id}/resumes/{resume_id}` | Delete snapshot |
+
+### Tailoring & Resume Variants
+Tailoring never modifies the master profile. Suggestions are verified against the source profile, and approved variants are stored separately.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/v1/users/{user_id}/tailoring-runs` | Generate verified bullet suggestions for a job description |
+| GET | `/v1/tailoring-runs/{run_id}` | Get a tailoring run and its suggestions |
+| POST | `/v1/tailoring-runs/{run_id}/variants` | Create a draft variant from accept/edit/reject decisions |
+| GET | `/v1/resume-variants/{variant_id}` | Get a resume variant |
+| POST | `/v1/resume-variants/{variant_id}/approve` | Approve a variant |
+| GET | `/v1/resume-variants/{variant_id}/pdf` | Render a variant as PDF |
